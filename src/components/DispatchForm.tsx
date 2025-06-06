@@ -59,6 +59,16 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
     }
   }, [productType]);
 
+  // Auto-populate dispatch price based on order type and items
+  useEffect(() => {
+    if (order.items && order.items.length > 0) {
+      // Calculate average price from order items
+      const totalPrice = order.items.reduce((sum, item) => sum + item.price, 0);
+      const averagePrice = totalPrice / order.items.length;
+      setDispatchPrice(averagePrice);
+    }
+  }, [order.items]);
+
   if (order.status === 'completed') {
     return (
       <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
@@ -115,7 +125,12 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
       
       setDate(getTodayDate());
       setQuantity(null);
-      setDispatchPrice(null);
+      // Reset dispatch price to order's average price
+      if (order.items && order.items.length > 0) {
+        const totalPrice = order.items.reduce((sum, item) => sum + item.price, 0);
+        const averagePrice = totalPrice / order.items.length;
+        setDispatchPrice(averagePrice);
+      }
       setInvoiceNumber('');
       setNotes('');
       setStatus(order.status);
@@ -246,6 +261,9 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
         <div>
           <label htmlFor="dispatch-price" className="block text-sm font-medium text-gray-700">
             Dispatch Price (₹)
+            <span className="text-xs text-gray-500 ml-1">
+              (Auto-filled from {order.type === 'sale' ? 'sales' : 'purchase'} price)
+            </span>
           </label>
           <input
             type="number"
