@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TruckIcon, AlertCircle } from 'lucide-react';
 import { Order, OrderStatus } from '../types';
 import { createDispatch } from '../services/orderService';
@@ -9,6 +9,33 @@ interface DispatchFormProps {
   onDispatchCreated: () => void;
 }
 
+// Product type mapping with gauge differences
+const PRODUCT_TYPES = {
+  '40x3': 7800,
+  '30x3': 7800,
+  '32x3': 7500,
+  '35x5': 7200,
+  '35x4': 7500,
+  '40x5': 7000,
+  '40x6': 7000,
+  '50x5': 6400,
+  '65x5': 6400,
+  '75x5': 6400,
+  '50x6': 6100,
+  '65x6': 6100,
+  '75x6': 6100,
+  '65x8': 6400,
+  '75x8': 6400,
+  '65x10': 6700,
+  '75x10': 6700,
+  '50x4': 7500,
+  '40x4': 7500,
+  '45x4': 7800,
+  '45x5': 7200
+};
+
+const TAX_RATES = [7, 12, 18];
+
 const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated }) => {
   const [date, setDate] = useState(getTodayDate());
   const [quantity, setQuantity] = useState<number | null>(null);
@@ -16,8 +43,21 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [notes, setNotes] = useState('');
   const [status, setStatus] = useState<OrderStatus>(order.status);
+  const [productType, setProductType] = useState<string>('');
+  const [gaugeDifference, setGaugeDifference] = useState<number | null>(null);
+  const [loadingCharge, setLoadingCharge] = useState<number | null>(null);
+  const [taxRate, setTaxRate] = useState<number>(18);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Auto-fill gauge difference when product type changes
+  useEffect(() => {
+    if (productType && PRODUCT_TYPES[productType as keyof typeof PRODUCT_TYPES]) {
+      setGaugeDifference(PRODUCT_TYPES[productType as keyof typeof PRODUCT_TYPES]);
+    } else {
+      setGaugeDifference(null);
+    }
+  }, [productType]);
 
   if (order.status === 'completed') {
     return (
@@ -49,6 +89,11 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
       setError('Price cannot be negative');
       return;
     }
+
+    if (loadingCharge && loadingCharge < 0) {
+      setError('Loading charge cannot be negative');
+      return;
+    }
     
     setIsSubmitting(true);
     
@@ -59,7 +104,11 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
         dispatchPrice,
         invoiceNumber,
         notes,
-        status
+        status,
+        productType,
+        gaugeDifference,
+        loadingCharge,
+        taxRate
       });
       
       onDispatchCreated();
@@ -70,6 +119,10 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
       setInvoiceNumber('');
       setNotes('');
       setStatus(order.status);
+      setProductType('');
+      setGaugeDifference(null);
+      setLoadingCharge(null);
+      setTaxRate(18);
     } catch (error) {
       console.error('Error creating dispatch:', error);
       setError('Failed to create dispatch. Please try again.');
@@ -119,6 +172,75 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             required
           />
+        </div>
+
+        <div>
+          <label htmlFor="product-type" className="block text-sm font-medium text-gray-700">
+            Product Type
+          </label>
+          <select
+            id="product-type"
+            value={productType}
+            onChange={(e) => setProductType(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            required
+          >
+            <option value="">Select Product Type</option>
+            {Object.keys(PRODUCT_TYPES).map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="gauge-difference" className="block text-sm font-medium text-gray-700">
+            Gauge Difference
+          </label>
+          <input
+            type="number"
+            id="gauge-difference"
+            value={gaugeDifference || ''}
+            readOnly
+            className="mt-1 block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            placeholder="Auto-filled based on product type"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="loading-charge" className="block text-sm font-medium text-gray-700">
+            Loading Charge (₹)
+          </label>
+          <input
+            type="number"
+            id="loading-charge"
+            value={loadingCharge || ''}
+            onChange={(e) => setLoadingCharge(parseFloat(e.target.value) || null)}
+            min="0"
+            step="0.01"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            placeholder="Enter loading charge"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="tax-rate" className="block text-sm font-medium text-gray-700">
+            Tax Rate (%)
+          </label>
+          <select
+            id="tax-rate"
+            value={taxRate}
+            onChange={(e) => setTaxRate(parseFloat(e.target.value))}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            required
+          >
+            {TAX_RATES.map((rate) => (
+              <option key={rate} value={rate}>
+                {rate}%
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>

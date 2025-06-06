@@ -42,6 +42,10 @@ export interface Dispatch {
   notes?: string;
   createdAt: string;
   status?: OrderStatus;
+  productType?: string;
+  gaugeDifference?: number;
+  loadingCharge?: number;
+  taxRate?: number;
 }
 
 export interface Payment {

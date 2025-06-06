@@ -317,7 +317,11 @@ export const createDispatch = async (orderId: string, dispatchData: Partial<Disp
       notes: dispatchData.notes,
       user_id: session.session.user.id,
       dispatch_price: dispatchData.dispatchPrice || 0,
-      invoice_number: dispatchData.invoiceNumber
+      invoice_number: dispatchData.invoiceNumber,
+      product_type: dispatchData.productType,
+      gauge_difference: dispatchData.gaugeDifference,
+      loading_charge: dispatchData.loadingCharge,
+      tax_rate: dispatchData.taxRate
     })
     .select()
     .single();
@@ -398,7 +402,11 @@ export const getDispatchesByOrderId = async (orderId: string): Promise<Dispatch[
     dispatchPrice: d.dispatch_price || 0,
     invoiceNumber: d.invoice_number || '',
     notes: d.notes,
-    createdAt: d.created_at
+    createdAt: d.created_at,
+    productType: d.product_type,
+    gaugeDifference: d.gauge_difference,
+    loadingCharge: d.loading_charge,
+    taxRate: d.tax_rate
   }));
 
   return dispatches;
