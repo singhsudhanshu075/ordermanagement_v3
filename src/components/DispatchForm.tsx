@@ -97,8 +97,8 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
       return;
     }
 
-    if (!newProductTypeGaugeDifference || newProductTypeGaugeDifference <= 0) {
-      setError('Gauge difference must be a positive number');
+    if (newProductTypeGaugeDifference === null || newProductTypeGaugeDifference < 0) {
+      setError('Gauge difference must be 0 or a positive number');
       return;
     }
 
@@ -320,7 +320,7 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
             <input
               type="number"
               id="gauge-difference"
-              value={gaugeDifference || ''}
+              value={gaugeDifference !== null ? gaugeDifference : ''}
               readOnly
               className="block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
               placeholder="Auto-filled"
@@ -350,13 +350,14 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
                 <div>
                   <label className="block text-xs font-medium text-blue-700 mb-1">
                     Gauge Difference *
+                    <span className="text-xs text-blue-600 block font-normal">Can be 0 or any positive number</span>
                   </label>
                   <input
                     type="number"
-                    value={newProductTypeGaugeDifference || ''}
+                    value={newProductTypeGaugeDifference !== null ? newProductTypeGaugeDifference : ''}
                     onChange={(e) => setNewProductTypeGaugeDifference(parseFloat(e.target.value) || null)}
-                    placeholder="e.g., 7800"
-                    min="1"
+                    placeholder="e.g., 7800 or 0"
+                    min="0"
                     className="block w-full rounded-md border-blue-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm h-10"
                     required
                   />
