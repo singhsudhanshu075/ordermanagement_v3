@@ -60,3 +60,36 @@ export interface Payment {
   createdAt: string;
   order?: Order;
 }
+
+// Master data interfaces
+export interface Product {
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
+}
+
+export interface Customer {
+  id: string;
+  name: string;
+  contactPerson?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
+}
+
+export interface Supplier {
+  id: string;
+  name: string;
+  contactPerson?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
+}
