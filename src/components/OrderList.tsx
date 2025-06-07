@@ -54,9 +54,10 @@ const OrderList: React.FC<OrderListProps> = ({ orders, onOrderSelect }) => {
     return 'text-slate-600 font-medium';
   };
 
-  const calculateOrderTotal = (order: Order): number => {
+  const calculateOrderPrice = (order: Order): number => {
+    // Calculate total price (without commission) from order items
     return order.items?.reduce((sum, item) => 
-      sum + ((item.price + item.commission) * item.quantity), 0) || 0;
+      sum + (item.price * item.quantity), 0) || 0;
   };
 
   return (
@@ -81,7 +82,7 @@ const OrderList: React.FC<OrderListProps> = ({ orders, onOrderSelect }) => {
                 Total Qty
               </th>
               <th scope="col" className="px-3 sm:px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider min-w-[120px] bg-green-50">
-                Total Price
+                Price
               </th>
               <th scope="col" className="px-3 sm:px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider min-w-[100px] bg-orange-50">
                 Status
@@ -93,7 +94,7 @@ const OrderList: React.FC<OrderListProps> = ({ orders, onOrderSelect }) => {
           </thead>
           <tbody className="bg-white">
             {orders.map((order, index) => {
-              const totalPrice = calculateOrderTotal(order);
+              const orderPrice = calculateOrderPrice(order);
               
               return (
                 <tr
@@ -134,9 +135,9 @@ const OrderList: React.FC<OrderListProps> = ({ orders, onOrderSelect }) => {
                   <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm bg-green-50/30">
                     <div className="flex items-center">
                       <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-green-600 mr-1 flex-shrink-0" />
-                      <span className={`font-mono ${getPriceColor(totalPrice)}`}>
-                        <span className="hidden sm:inline">{formatCurrency(totalPrice)}</span>
-                        <span className="sm:hidden">₹{(totalPrice / 1000).toFixed(0)}k</span>
+                      <span className={`font-mono ${getPriceColor(orderPrice)}`}>
+                        <span className="hidden sm:inline">{formatCurrency(orderPrice)}</span>
+                        <span className="sm:hidden">₹{(orderPrice / 1000).toFixed(0)}k</span>
                       </span>
                     </div>
                   </td>
