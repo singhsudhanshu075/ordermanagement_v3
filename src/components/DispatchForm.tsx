@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { TruckIcon, AlertCircle, Loader2 } from 'lucide-react';
-import { Order, OrderStatus, ProductType } from '../types';
+import { Order, OrderStatus, ProductType, ProductTypeCategory } from '../types';
 import { createDispatch } from '../services/orderService';
-import { getProductTypes } from '../services/masterDataService';
+import { getProductTypes, createProductType } from '../services/masterDataService';
 import { getTodayDate } from '../utils/helpers';
 
 interface DispatchFormProps {
@@ -30,6 +30,13 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
   const [productTypes, setProductTypes] = useState<ProductType[]>([]);
   const [loadingProductTypes, setLoadingProductTypes] = useState(true);
   const [productTypesError, setProductTypesError] = useState<string | null>(null);
+
+  // New product type form state
+  const [showNewProductTypeForm, setShowNewProductTypeForm] = useState(false);
+  const [newProductTypeName, setNewProductTypeName] = useState('');
+  const [newProductTypeGaugeDifference, setNewProductTypeGaugeDifference] = useState<number | null>(null);
+  const [newProductTypeCategory, setNewProductTypeCategory] = useState<ProductTypeCategory>('both');
+  const [isCreatingProductType, setIsCreatingProductType] = useState(false);
 
   // Load product types based on order type
   useEffect(() => {
@@ -74,6 +81,64 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
     }
   }, [order.items]);
 
+  const handleProductTypeSelect = (value: string) => {
+    if (value === 'ADD_NEW_PRODUCT_TYPE') {
+      setShowNewProductTypeForm(true);
+      setProductType('');
+    } else {
+      setShowNewProductTypeForm(false);
+      setProductType(value);
+    }
+  };
+
+  const handleCreateNewProductType = async () => {
+    if (!newProductTypeName.trim()) {
+      setError('Product type name is required');
+      return;
+    }
+
+    if (!newProductTypeGaugeDifference || newProductTypeGaugeDifference <= 0) {
+      setError('Gauge difference must be a positive number');
+      return;
+    }
+
+    setIsCreatingProductType(true);
+    setError(null);
+
+    try {
+      const newProductType = await createProductType({
+        name: newProductTypeName.trim(),
+        gaugeDifference: newProductTypeGaugeDifference,
+        type: newProductTypeCategory
+      });
+
+      // Add the new product type to the list
+      setProductTypes(prev => [...prev, newProductType]);
+      
+      // Select the newly created product type
+      setProductType(newProductType.name);
+      
+      // Reset form
+      setNewProductTypeName('');
+      setNewProductTypeGaugeDifference(null);
+      setNewProductTypeCategory('both');
+      setShowNewProductTypeForm(false);
+    } catch (error) {
+      console.error('Error creating product type:', error);
+      setError(error instanceof Error ? error.message : 'Failed to create product type');
+    } finally {
+      setIsCreatingProductType(false);
+    }
+  };
+
+  const handleCancelNewProductType = () => {
+    setNewProductTypeName('');
+    setNewProductTypeGaugeDifference(null);
+    setNewProductTypeCategory('both');
+    setShowNewProductTypeForm(false);
+    setError(null);
+  };
+
   if (order.status === 'completed') {
     return (
       <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
@@ -94,6 +159,11 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    
+    if (showNewProductTypeForm) {
+      setError('Please complete adding the new product type or cancel before submitting');
+      return;
+    }
     
     if (!quantity || quantity <= 0) {
       setError('Quantity must be greater than 0');
@@ -222,10 +292,10 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
               <select
                 id="product-type"
                 value={productType}
-                onChange={(e) => setProductType(e.target.value)}
+                onChange={(e) => handleProductTypeSelect(e.target.value)}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
                 required
-                disabled={productTypes.length === 0}
+                disabled={productTypes.length === 0 || showNewProductTypeForm}
               >
                 <option value="">Select Product Type</option>
                 {productTypes.map((type) => (
@@ -233,6 +303,7 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
                     {type.name}
                   </option>
                 ))}
+                <option value="ADD_NEW_PRODUCT_TYPE">+ Add New Product Type</option>
               </select>
             )}
             {!loadingProductTypes && productTypes.length === 0 && (
@@ -256,6 +327,76 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
             />
           </div>
         </div>
+
+        {/* New Product Type Form */}
+        {showNewProductTypeForm && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 className="text-sm font-medium text-blue-800 mb-3">Add New Product Type</h4>
+            <div className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-blue-700 mb-1">
+                    Product Type Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={newProductTypeName}
+                    onChange={(e) => setNewProductTypeName(e.target.value)}
+                    placeholder="e.g., 40x3"
+                    className="block w-full rounded-md border-blue-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm h-10"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-blue-700 mb-1">
+                    Gauge Difference *
+                  </label>
+                  <input
+                    type="number"
+                    value={newProductTypeGaugeDifference || ''}
+                    onChange={(e) => setNewProductTypeGaugeDifference(parseFloat(e.target.value) || null)}
+                    placeholder="e.g., 7800"
+                    min="1"
+                    className="block w-full rounded-md border-blue-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm h-10"
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-blue-700 mb-1">
+                  Available For
+                </label>
+                <select
+                  value={newProductTypeCategory}
+                  onChange={(e) => setNewProductTypeCategory(e.target.value as ProductTypeCategory)}
+                  className="block w-full rounded-md border-blue-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm h-10"
+                >
+                  <option value="both">Both Sales & Purchases</option>
+                  <option value="sale">Sales Only</option>
+                  <option value="purchase">Purchases Only</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-2 mt-4">
+              <button
+                type="button"
+                onClick={handleCreateNewProductType}
+                disabled={isCreatingProductType}
+                className="px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:bg-blue-400 touch-manipulation flex items-center"
+              >
+                {isCreatingProductType && <Loader2 className="h-3 w-3 animate-spin mr-1" />}
+                {isCreatingProductType ? 'Adding...' : 'Add Product Type'}
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelNewProductType}
+                className="px-3 py-2 bg-gray-300 text-gray-700 text-sm rounded-md hover:bg-gray-400 touch-manipulation"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Loading Charge and Tax Rate */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -366,9 +507,9 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
       <div className="flex justify-end pt-4">
         <button
           type="submit"
-          disabled={isSubmitting || loadingProductTypes}
+          disabled={isSubmitting || loadingProductTypes || showNewProductTypeForm}
           className={`w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white touch-manipulation ${
-            isSubmitting || loadingProductTypes
+            isSubmitting || loadingProductTypes || showNewProductTypeForm
               ? 'bg-gray-400 cursor-not-allowed'
               : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
           }`}
