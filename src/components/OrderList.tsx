@@ -1,5 +1,5 @@
 import React from 'react';
-import { Package, Truck, CreditCard, DollarSign } from 'lucide-react';
+import { Package, Truck, CreditCard, IndianRupee } from 'lucide-react';
 import { Order } from '../types';
 import { formatDateForDisplay, formatCurrency } from '../utils/helpers';
 
@@ -48,16 +48,15 @@ const OrderList: React.FC<OrderListProps> = ({ orders, onOrderSelect }) => {
   };
 
   const getPriceColor = (amount: number): string => {
-    if (amount > 500000) return 'text-emerald-700 font-bold';
-    if (amount > 100000) return 'text-blue-700 font-semibold';
-    if (amount > 50000) return 'text-indigo-700 font-medium';
+    if (amount > 10000) return 'text-emerald-700 font-bold';
+    if (amount > 5000) return 'text-blue-700 font-semibold';
+    if (amount > 2000) return 'text-indigo-700 font-medium';
     return 'text-slate-600 font-medium';
   };
 
-  const calculateOrderPrice = (order: Order): number => {
-    // Calculate total price (without commission) from order items
-    return order.items?.reduce((sum, item) => 
-      sum + (item.price * item.quantity), 0) || 0;
+  const getOrderPrice = (order: Order): number => {
+    // Get the first item's price (not multiplied by quantity)
+    return order.items?.[0]?.price || 0;
   };
 
   return (
@@ -94,7 +93,7 @@ const OrderList: React.FC<OrderListProps> = ({ orders, onOrderSelect }) => {
           </thead>
           <tbody className="bg-white">
             {orders.map((order, index) => {
-              const orderPrice = calculateOrderPrice(order);
+              const orderPrice = getOrderPrice(order);
               
               return (
                 <tr
@@ -134,10 +133,10 @@ const OrderList: React.FC<OrderListProps> = ({ orders, onOrderSelect }) => {
                   </td>
                   <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm bg-green-50/30">
                     <div className="flex items-center">
-                      <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-green-600 mr-1 flex-shrink-0" />
+                      <IndianRupee className="h-3 w-3 sm:h-4 sm:w-4 text-green-600 mr-1 flex-shrink-0" />
                       <span className={`font-mono ${getPriceColor(orderPrice)}`}>
-                        <span className="hidden sm:inline">{formatCurrency(orderPrice)}</span>
-                        <span className="sm:hidden">₹{(orderPrice / 1000).toFixed(0)}k</span>
+                        <span className="hidden sm:inline">{orderPrice.toLocaleString('en-IN')}</span>
+                        <span className="sm:hidden">{(orderPrice / 1000).toFixed(0)}k</span>
                       </span>
                     </div>
                   </td>
