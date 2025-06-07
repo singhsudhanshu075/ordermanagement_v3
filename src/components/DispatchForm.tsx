@@ -280,7 +280,7 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
             <label htmlFor="product-type" className="block text-sm font-medium text-gray-700 mb-1">
               Product Type
               <span className="text-xs text-gray-500 block">
-                Showing {order.type === 'sale' ? 'sales' : 'purchase'} products
+                Showing products for {order.type} orders
               </span>
             </label>
             {loadingProductTypes ? (
@@ -371,9 +371,9 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
                   onChange={(e) => setNewProductTypeCategory(e.target.value as ProductTypeCategory)}
                   className="block w-full rounded-md border-blue-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm h-10"
                 >
-                  <option value="both">Both Sales & Purchases</option>
-                  <option value="sale">Sales Only</option>
-                  <option value="purchase">Purchases Only</option>
+                  <option value="both">Both</option>
+                  <option value="sale">Sale</option>
+                  <option value="purchase">Purchase</option>
                 </select>
               </div>
             </div>
