@@ -97,6 +97,7 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
       return;
     }
 
+    // Updated validation to explicitly allow 0
     if (newProductTypeGaugeDifference === null || newProductTypeGaugeDifference < 0) {
       setError('Gauge difference must be 0 or a positive number');
       return;
@@ -355,9 +356,20 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
                   <input
                     type="number"
                     value={newProductTypeGaugeDifference !== null ? newProductTypeGaugeDifference : ''}
-                    onChange={(e) => setNewProductTypeGaugeDifference(parseFloat(e.target.value) || null)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === '') {
+                        setNewProductTypeGaugeDifference(null);
+                      } else {
+                        const numValue = parseFloat(value);
+                        if (!isNaN(numValue) && numValue >= 0) {
+                          setNewProductTypeGaugeDifference(numValue);
+                        }
+                      }
+                    }}
                     placeholder="e.g., 7800 or 0"
                     min="0"
+                    step="1"
                     className="block w-full rounded-md border-blue-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm h-10"
                     required
                   />
@@ -382,7 +394,7 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
               <button
                 type="button"
                 onClick={handleCreateNewProductType}
-                disabled={isCreatingProductType}
+                disabled={isCreatingProductType || !newProductTypeName.trim() || newProductTypeGaugeDifference === null || newProductTypeGaugeDifference < 0}
                 className="px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:bg-blue-400 touch-manipulation flex items-center"
               >
                 {isCreatingProductType && <Loader2 className="h-3 w-3 animate-spin mr-1" />}
