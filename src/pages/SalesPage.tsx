@@ -7,6 +7,7 @@ const SalesPage: React.FC = () => {
   const [isOrderCreated, setIsOrderCreated] = useState(false);
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
   
+  
   const handleOrderCreated = (orderId: string) => {
     setCreatedOrderId(orderId);
     setIsOrderCreated(true);
@@ -22,7 +23,7 @@ const SalesPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
       {isOrderCreated ? (
         <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-md">
           <div className="flex">
@@ -41,16 +42,16 @@ const SalesPage: React.FC = () => {
                 </p>
               </div>
               <div className="mt-4">
-                <div className="-mx-2 -my-1.5 flex">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <button
                     onClick={handleViewOrder}
-                    className="bg-green-50 px-2 py-1.5 rounded-md text-sm font-medium text-green-800 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-green-50 focus:ring-green-600"
+                    className="bg-green-50 px-4 py-2 rounded-md text-sm font-medium text-green-800 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-green-50 focus:ring-green-600 touch-manipulation"
                   >
                     View Order
                   </button>
                   <button
                     onClick={handleCreateAnother}
-                    className="ml-3 bg-green-50 px-2 py-1.5 rounded-md text-sm font-medium text-green-800 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-green-50 focus:ring-green-600"
+                    className="bg-green-50 px-4 py-2 rounded-md text-sm font-medium text-green-800 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-green-50 focus:ring-green-600 touch-manipulation"
                   >
                     Create Another
                   </button>
@@ -61,7 +62,7 @@ const SalesPage: React.FC = () => {
         </div>
       ) : (
         <>
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">Create Sales Order</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Create Sales Order</h1>
           <OrderForm type="sale" onOrderCreated={handleOrderCreated} />
         </>
       )}

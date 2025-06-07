@@ -20,13 +20,13 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="bg-white shadow-md">
+    <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+        <div className="flex justify-between h-14 sm:h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <PackageSearch className="h-8 w-8 text-blue-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900">OrderTrack</span>
+              <PackageSearch className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
+              <span className="ml-2 text-lg sm:text-xl font-bold text-gray-900">OrderTrack</span>
             </div>
             
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
@@ -83,7 +83,8 @@ const Navbar: React.FC = () => {
                 }`}
               >
                 <CreditCard className="h-4 w-4 mr-1" />
-                Payments
+                <span className="hidden lg:inline">Payments</span>
+                <span className="lg:hidden">Pay</span>
               </Link>
             </div>
           </div>
@@ -92,10 +93,10 @@ const Navbar: React.FC = () => {
             <AuthButton />
           </div>
           
-          <div className="-mr-2 flex items-center sm:hidden">
+          <div className="flex items-center sm:hidden">
             <button
               onClick={toggleMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 touch-manipulation"
             >
               <span className="sr-only">Open main menu</span>
               {isMenuOpen ? (
@@ -110,11 +111,11 @@ const Navbar: React.FC = () => {
       
       {/* Mobile menu */}
       <div className={`sm:hidden ${isMenuOpen ? 'block' : 'hidden'}`}>
-        <div className="pt-2 pb-3 space-y-1">
+        <div className="pt-2 pb-3 space-y-1 bg-white border-t border-gray-200">
           <Link
             to="/"
             onClick={closeMenu}
-            className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
+            className={`block pl-3 pr-4 py-3 border-l-4 text-base font-medium touch-manipulation ${
               isActive('/') 
                 ? 'bg-blue-50 border-blue-500 text-blue-700'
                 : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
@@ -126,7 +127,7 @@ const Navbar: React.FC = () => {
           <Link
             to="/sales"
             onClick={closeMenu}
-            className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
+            className={`block pl-3 pr-4 py-3 border-l-4 text-base font-medium touch-manipulation ${
               isActive('/sales') 
                 ? 'bg-blue-50 border-blue-500 text-blue-700'
                 : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
@@ -138,7 +139,7 @@ const Navbar: React.FC = () => {
           <Link
             to="/purchases"
             onClick={closeMenu}
-            className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
+            className={`block pl-3 pr-4 py-3 border-l-4 text-base font-medium touch-manipulation ${
               isActive('/purchases') 
                 ? 'bg-blue-50 border-blue-500 text-blue-700'
                 : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
@@ -150,7 +151,7 @@ const Navbar: React.FC = () => {
           <Link
             to="/orders"
             onClick={closeMenu}
-            className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
+            className={`block pl-3 pr-4 py-3 border-l-4 text-base font-medium touch-manipulation ${
               isActive('/orders') 
                 ? 'bg-blue-50 border-blue-500 text-blue-700'
                 : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
@@ -162,7 +163,7 @@ const Navbar: React.FC = () => {
           <Link
             to="/payments"
             onClick={closeMenu}
-            className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
+            className={`block pl-3 pr-4 py-3 border-l-4 text-base font-medium touch-manipulation ${
               isActive('/payments') 
                 ? 'bg-blue-50 border-blue-500 text-blue-700'
                 : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
@@ -171,7 +172,7 @@ const Navbar: React.FC = () => {
             Payments
           </Link>
           
-          <div className="pl-3 pr-4 py-2">
+          <div className="pl-3 pr-4 py-3 border-t border-gray-200">
             <AuthButton />
           </div>
         </div>

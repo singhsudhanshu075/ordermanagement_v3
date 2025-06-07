@@ -148,7 +148,7 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="flex items-center text-lg font-semibold text-gray-800 mb-2">
+      <div className="flex items-center text-base sm:text-lg font-semibold text-gray-800 mb-2">
         <TruckIcon className="mr-2 text-blue-600" size={20} /> Record Dispatch
       </div>
       
@@ -158,146 +158,160 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
         </div>
       )}
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="dispatch-date" className="block text-sm font-medium text-gray-700">
-            Dispatch Date
-          </label>
-          <input
-            type="date"
-            id="dispatch-date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            required
-          />
-        </div>
-        
-        <div>
-          <label htmlFor="dispatch-quantity" className="block text-sm font-medium text-gray-700">
-            Quantity (Remaining: {order.remainingQuantity?.toFixed(2)})
-          </label>
-          <input
-            type="number"
-            id="dispatch-quantity"
-            value={quantity || ''}
-            onChange={(e) => setQuantity(parseFloat(e.target.value) || null)}
-            min="0.01"
-            step="0.01"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="product-type" className="block text-sm font-medium text-gray-700">
-            Product Type
-          </label>
-          <select
-            id="product-type"
-            value={productType}
-            onChange={(e) => setProductType(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            required
-          >
-            <option value="">Select Product Type</option>
-            {Object.keys(PRODUCT_TYPES).map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
+      <div className="space-y-4">
+        {/* Date and Quantity */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="dispatch-date" className="block text-sm font-medium text-gray-700 mb-1">
+              Dispatch Date
+            </label>
+            <input
+              type="date"
+              id="dispatch-date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
+              required
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="dispatch-quantity" className="block text-sm font-medium text-gray-700 mb-1">
+              Quantity
+              <span className="text-xs text-gray-500 block">Remaining: {order.remainingQuantity?.toFixed(2)}</span>
+            </label>
+            <input
+              type="number"
+              id="dispatch-quantity"
+              value={quantity || ''}
+              onChange={(e) => setQuantity(parseFloat(e.target.value) || null)}
+              min="0.01"
+              step="0.01"
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
+              required
+            />
+          </div>
         </div>
 
-        <div>
-          <label htmlFor="gauge-difference" className="block text-sm font-medium text-gray-700">
-            Gauge Difference
-          </label>
-          <input
-            type="number"
-            id="gauge-difference"
-            value={gaugeDifference || ''}
-            readOnly
-            className="mt-1 block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            placeholder="Auto-filled based on product type"
-          />
+        {/* Product Type and Gauge Difference */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="product-type" className="block text-sm font-medium text-gray-700 mb-1">
+              Product Type
+            </label>
+            <select
+              id="product-type"
+              value={productType}
+              onChange={(e) => setProductType(e.target.value)}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
+              required
+            >
+              <option value="">Select Product Type</option>
+              {Object.keys(PRODUCT_TYPES).map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="gauge-difference" className="block text-sm font-medium text-gray-700 mb-1">
+              Gauge Difference
+            </label>
+            <input
+              type="number"
+              id="gauge-difference"
+              value={gaugeDifference || ''}
+              readOnly
+              className="block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
+              placeholder="Auto-filled"
+            />
+          </div>
         </div>
 
-        <div>
-          <label htmlFor="loading-charge" className="block text-sm font-medium text-gray-700">
-            Loading Charge (₹)
-          </label>
-          <input
-            type="number"
-            id="loading-charge"
-            value={loadingCharge || ''}
-            onChange={(e) => setLoadingCharge(parseFloat(e.target.value) || null)}
-            min="0"
-            step="0.01"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            placeholder="Enter loading charge"
-          />
+        {/* Loading Charge and Tax Rate */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="loading-charge" className="block text-sm font-medium text-gray-700 mb-1">
+              Loading Charge (₹)
+            </label>
+            <input
+              type="number"
+              id="loading-charge"
+              value={loadingCharge || ''}
+              onChange={(e) => setLoadingCharge(parseFloat(e.target.value) || null)}
+              min="0"
+              step="0.01"
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
+              placeholder="Enter loading charge"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="tax-rate" className="block text-sm font-medium text-gray-700 mb-1">
+              Tax Rate (%)
+            </label>
+            <select
+              id="tax-rate"
+              value={taxRate}
+              onChange={(e) => setTaxRate(parseFloat(e.target.value))}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
+              required
+            >
+              {TAX_RATES.map((rate) => (
+                <option key={rate} value={rate}>
+                  {rate}%
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        <div>
-          <label htmlFor="tax-rate" className="block text-sm font-medium text-gray-700">
-            Tax Rate (%)
-          </label>
-          <select
-            id="tax-rate"
-            value={taxRate}
-            onChange={(e) => setTaxRate(parseFloat(e.target.value))}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            required
-          >
-            {TAX_RATES.map((rate) => (
-              <option key={rate} value={rate}>
-                {rate}%
-              </option>
-            ))}
-          </select>
+        {/* Dispatch Price and Invoice Number */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="dispatch-price" className="block text-sm font-medium text-gray-700 mb-1">
+              Dispatch Price (₹)
+              <span className="text-xs text-gray-500 block">
+                Auto-filled from {order.type === 'sale' ? 'sales' : 'purchase'} price
+              </span>
+            </label>
+            <input
+              type="number"
+              id="dispatch-price"
+              value={dispatchPrice || ''}
+              min="0"
+              step="0.01"
+              onChange={(e) => setDispatchPrice(parseFloat(e.target.value) || null)}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="invoice-number" className="block text-sm font-medium text-gray-700 mb-1">
+              Invoice Number
+            </label>
+            <input
+              type="text"
+              id="invoice-number"
+              value={invoiceNumber}
+              onChange={(e) => setInvoiceNumber(e.target.value)}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
+            />
+          </div>
         </div>
 
+        {/* Order Status */}
         <div>
-          <label htmlFor="dispatch-price" className="block text-sm font-medium text-gray-700">
-            Dispatch Price (₹)
-            <span className="text-xs text-gray-500 ml-1">
-              (Auto-filled from {order.type === 'sale' ? 'sales' : 'purchase'} price)
-            </span>
-          </label>
-          <input
-            type="number"
-            id="dispatch-price"
-            value={dispatchPrice || ''}
-            min="0"
-            step="0.01"
-            onChange={(e) => setDispatchPrice(parseFloat(e.target.value) || null)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="invoice-number" className="block text-sm font-medium text-gray-700">
-            Invoice Number
-          </label>
-          <input
-            type="text"
-            id="invoice-number"
-            value={invoiceNumber}
-            onChange={(e) => setInvoiceNumber(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="order-status" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="order-status" className="block text-sm font-medium text-gray-700 mb-1">
             Order Status
           </label>
           <select
             id="order-status"
             value={status}
             onChange={(e) => setStatus(e.target.value as OrderStatus)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
             required
           >
             <option value="pending">Pending</option>
@@ -306,32 +320,33 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
             <option value="cancelled">Cancelled</option>
           </select>
         </div>
+        
+        {/* Notes */}
+        <div>
+          <label htmlFor="dispatch-notes" className="block text-sm font-medium text-gray-700 mb-1">
+            Notes (Optional)
+          </label>
+          <textarea
+            id="dispatch-notes"
+            rows={3}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm"
+          />
+        </div>
       </div>
       
-      <div>
-        <label htmlFor="dispatch-notes" className="block text-sm font-medium text-gray-700">
-          Notes (Optional)
-        </label>
-        <textarea
-          id="dispatch-notes"
-          rows={2}
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        />
-      </div>
-      
-      <div className="flex justify-end">
+      <div className="flex justify-end pt-4">
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
+          className={`w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white touch-manipulation ${
             isSubmitting
               ? 'bg-gray-400 cursor-not-allowed'
               : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
           }`}
         >
-          {isSubmitting ? 'Submitting...' : 'Record Dispatch'}
+          {isSubmitting ? 'Recording...' : 'Record Dispatch'}
         </button>
       </div>
     </form>

@@ -118,7 +118,7 @@ const OrdersPage: React.FC = () => {
       itemSum + (item.commission * item.quantity), 0), 0);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-10">
       <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Manage Orders</h1>
       
       <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row gap-3">
@@ -129,7 +129,7 @@ const OrdersPage: React.FC = () => {
           <input
             type="text"
             placeholder="Search orders..."
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+            className="block w-full pl-10 pr-3 py-3 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-base sm:text-sm"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -137,7 +137,7 @@ const OrdersPage: React.FC = () => {
         
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="inline-flex items-center justify-center px-4 py-3 sm:py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 touch-manipulation"
         >
           <Filter className="h-5 w-5 mr-2" />
           Filters
@@ -150,7 +150,7 @@ const OrdersPage: React.FC = () => {
             <h3 className="font-medium text-gray-700">Filters</h3>
             <button 
               onClick={clearFilters}
-              className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+              className="text-sm text-blue-600 hover:text-blue-800 flex items-center touch-manipulation"
             >
               <X className="h-4 w-4 mr-1" />
               Clear filters
@@ -159,9 +159,9 @@ const OrdersPage: React.FC = () => {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Order Type</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Order Type</label>
               <select
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value as 'all' | 'sale' | 'purchase')}
               >
@@ -172,10 +172,10 @@ const OrdersPage: React.FC = () => {
             </div>
             
             <div className="relative" ref={statusDropdownRef}>
-              <label className="block text-sm font-medium text-gray-700">Status</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
               <button
                 type="button"
-                className="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm mt-1"
+                className="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-3 sm:py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-base sm:text-sm h-12 sm:h-10 touch-manipulation"
                 onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
               >
                 <span className="block truncate">
@@ -195,7 +195,7 @@ const OrdersPage: React.FC = () => {
                   {['pending', 'partial', 'completed', 'cancelled'].map((status) => (
                     <div
                       key={status}
-                      className="relative py-2 pl-3 pr-9 cursor-pointer hover:bg-gray-100"
+                      className="relative py-3 sm:py-2 pl-3 pr-9 cursor-pointer hover:bg-gray-100 touch-manipulation"
                       onClick={() => handleStatusFilterChange(status)}
                     >
                       <div className="flex items-center">
@@ -216,10 +216,10 @@ const OrdersPage: React.FC = () => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700">Customer</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Customer</label>
               <input
                 type="text"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
                 value={customerFilter}
                 onChange={(e) => setCustomerFilter(e.target.value)}
                 placeholder="Filter by customer..."
@@ -227,10 +227,10 @@ const OrdersPage: React.FC = () => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700">Supplier</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
               <input
                 type="text"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
                 value={supplierFilter}
                 onChange={(e) => setSupplierFilter(e.target.value)}
                 placeholder="Filter by supplier..."
@@ -238,20 +238,20 @@ const OrdersPage: React.FC = () => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700">From Date</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">From Date</label>
               <input
                 type="date"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700">To Date</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">To Date</label>
               <input
                 type="date"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
               />
@@ -261,22 +261,22 @@ const OrdersPage: React.FC = () => {
       )}
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
           <div className="flex items-center">
-            <div className="flex-shrink-0 bg-blue-100 rounded-md p-3">
-              <Box className="h-6 w-6 text-blue-600" />
+            <div className="flex-shrink-0 bg-blue-100 rounded-md p-2 sm:p-3">
+              <Box className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Sales Quantity</p>
+            <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-500">Sales Quantity</p>
               <div className="space-y-1">
-                <p className="text-lg font-semibold text-gray-900">
+                <p className="text-sm sm:text-lg font-semibold text-gray-900">
                   Total: {totalSalesQuantity.toFixed(2)}
                 </p>
-                <p className="text-sm text-amber-600">
+                <p className="text-xs sm:text-sm text-amber-600">
                   Dispatched: {totalSalesDispatched.toFixed(2)}
                 </p>
-                <p className="text-sm text-red-600">
+                <p className="text-xs sm:text-sm text-red-600">
                   Remaining: {totalSalesRemaining.toFixed(2)}
                 </p>
               </div>
@@ -284,21 +284,21 @@ const OrdersPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
           <div className="flex items-center">
-            <div className="flex-shrink-0 bg-emerald-100 rounded-md p-3">
-              <Box className="h-6 w-6 text-emerald-600" />
+            <div className="flex-shrink-0 bg-emerald-100 rounded-md p-2 sm:p-3">
+              <Box className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-600" />
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Purchase Quantity</p>
+            <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-500">Purchase Quantity</p>
               <div className="space-y-1">
-                <p className="text-lg font-semibold text-gray-900">
+                <p className="text-sm sm:text-lg font-semibold text-gray-900">
                   Total: {totalPurchaseQuantity.toFixed(2)}
                 </p>
-                <p className="text-sm text-amber-600">
+                <p className="text-xs sm:text-sm text-amber-600">
                   Dispatched: {totalPurchaseDispatched.toFixed(2)}
                 </p>
-                <p className="text-sm text-red-600">
+                <p className="text-xs sm:text-sm text-red-600">
                   Remaining: {totalPurchaseRemaining.toFixed(2)}
                 </p>
               </div>
@@ -306,18 +306,18 @@ const OrdersPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
           <div className="flex items-center">
-            <div className="flex-shrink-0 bg-blue-100 rounded-md p-3">
-              <TrendingUp className="h-6 w-6 text-blue-600" />
+            <div className="flex-shrink-0 bg-blue-100 rounded-md p-2 sm:p-3">
+              <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Sales Amount</p>
+            <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-500">Sales Amount</p>
               <div className="space-y-1">
-                <p className="text-lg font-semibold text-gray-900">
+                <p className="text-sm sm:text-lg font-semibold text-gray-900">
                   {formatCurrency(totalSalesAmount)}
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-xs sm:text-sm text-gray-600">
                   Commission: {formatCurrency(totalSalesCommission)}
                 </p>
               </div>
@@ -325,18 +325,18 @@ const OrdersPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
           <div className="flex items-center">
-            <div className="flex-shrink-0 bg-emerald-100 rounded-md p-3">
-              <TrendingDown className="h-6 w-6 text-emerald-600" />
+            <div className="flex-shrink-0 bg-emerald-100 rounded-md p-2 sm:p-3">
+              <TrendingDown className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-600" />
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Purchase Amount</p>
+            <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-500">Purchase Amount</p>
               <div className="space-y-1">
-                <p className="text-lg font-semibold text-gray-900">
+                <p className="text-sm sm:text-lg font-semibold text-gray-900">
                   {formatCurrency(totalPurchaseAmount)}
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-xs sm:text-sm text-gray-600">
                   Commission: {formatCurrency(totalPurchaseCommission)}
                 </p>
               </div>
@@ -368,13 +368,13 @@ const OrdersPage: React.FC = () => {
           <div className="mt-6 flex flex-col sm:flex-row justify-center gap-4">
             <button
               onClick={() => navigate('/sales')}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="inline-flex items-center justify-center px-4 py-3 sm:py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 touch-manipulation"
             >
               Create Sale
             </button>
             <button
               onClick={() => navigate('/purchases')}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+              className="inline-flex items-center justify-center px-4 py-3 sm:py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 touch-manipulation"
             >
               Create Purchase
             </button>

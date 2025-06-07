@@ -32,7 +32,67 @@ const OrderList: React.FC<OrderListProps> = ({ orders, onOrderSelect }) => {
 
   return (
     <div className="bg-white shadow-md rounded-lg overflow-hidden">
-      <div className="overflow-x-auto">
+      {/* Mobile Card View */}
+      <div className="block sm:hidden">
+        <div className="divide-y divide-gray-200">
+          {orders.map((order) => (
+            <div
+              key={order.id}
+              onClick={() => onOrderSelect(order.id)}
+              className="p-4 hover:bg-gray-50 cursor-pointer transition-colors duration-150 touch-manipulation"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center">
+                  {order.type === 'sale' ? (
+                    <Truck className="h-5 w-5 text-blue-600 mr-2" />
+                  ) : (
+                    <Package className="h-5 w-5 text-emerald-600 mr-2" />
+                  )}
+                  <span className="font-medium text-gray-900 text-sm">
+                    {order.id.slice(-8)}...
+                  </span>
+                </div>
+                <div className="flex gap-1">
+                  <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(order.status)}`}>
+                    {order.status}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="space-y-1 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Type:</span>
+                  <span className="capitalize">{order.type}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Date:</span>
+                  <span>{formatDateForDisplay(order.date)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Contact:</span>
+                  <span className="truncate max-w-32">
+                    {order.type === 'sale' ? order.customer : order.supplier}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Quantity:</span>
+                  <span>{order.totalQuantity?.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500">Payment:</span>
+                  <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(order.paymentStatus)}`}>
+                    <CreditCard className="h-3 w-3 mr-1" />
+                    {order.paymentStatus}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden sm:block overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -73,8 +133,8 @@ const OrderList: React.FC<OrderListProps> = ({ orders, onOrderSelect }) => {
                     ) : (
                       <Package className="h-5 w-5 text-emerald-600 mr-2" />
                     )}
-                    <span className="hidden sm:inline">{order.id}</span>
-                    <span className="sm:hidden">{order.id.slice(-8)}</span>
+                    <span className="hidden lg:inline">{order.id}</span>
+                    <span className="lg:hidden">{order.id.slice(-8)}</span>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">

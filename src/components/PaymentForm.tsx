@@ -88,128 +88,134 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ orderId, paymentStatus = 'pen
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            <div className="flex items-center gap-2">
-              <BanknoteIcon className="w-4 h-4" />
-              Amount
+      <div className="space-y-4">
+        {/* Amount and Date */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center gap-2">
+                <BanknoteIcon className="w-4 h-4" />
+                Amount
+              </div>
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">₹</span>
+              <input
+                type="number"
+                name="amount"
+                step="0.01"
+                required
+                value={formData.amount}
+                onChange={handleChange}
+                className="pl-7 w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-base sm:text-sm h-12 sm:h-10"
+                placeholder="0.00"
+              />
             </div>
-          </label>
-          <div className="relative">
-            <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">₹</span>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                Payment Date
+              </div>
+            </label>
             <input
-              type="number"
-              name="amount"
-              step="0.01"
+              type="date"
+              name="payment_date"
               required
-              value={formData.amount}
+              value={formData.payment_date}
               onChange={handleChange}
-              className="pl-7 w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              placeholder="0.00"
+              className="w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-base sm:text-sm h-12 sm:h-10"
             />
           </div>
         </div>
 
+        {/* Payment Mode and Status */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center gap-2">
+                <CreditCard className="w-4 h-4" />
+                Payment Mode
+              </div>
+            </label>
+            <select
+              name="payment_mode"
+              required
+              value={formData.payment_mode}
+              onChange={handleChange}
+              className="w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-base sm:text-sm h-12 sm:h-10"
+            >
+              <option value="cash">Cash</option>
+              <option value="bank_transfer">Bank Transfer</option>
+              <option value="cheque">Cheque</option>
+              <option value="upi">UPI</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center gap-2">
+                <CreditCard className="w-4 h-4" />
+                Payment Status
+              </div>
+            </label>
+            <select
+              name="payment_status"
+              required
+              value={formData.payment_status}
+              onChange={handleChange}
+              className="w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-base sm:text-sm h-12 sm:h-10"
+            >
+              <option value="pending">Pending</option>
+              <option value="partial">Partial</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Reference Number */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              Payment Date
+              <FileText className="w-4 h-4" />
+              Reference Number
             </div>
           </label>
           <input
-            type="date"
-            name="payment_date"
-            required
-            value={formData.payment_date}
+            type="text"
+            name="reference_number"
+            value={formData.reference_number}
             onChange={handleChange}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-base sm:text-sm h-12 sm:h-10"
+            placeholder="Enter reference number (optional)"
           />
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Notes */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             <div className="flex items-center gap-2">
-              <CreditCard className="w-4 h-4" />
-              Payment Mode
+              <FileText className="w-4 h-4" />
+              Notes
             </div>
           </label>
-          <select
-            name="payment_mode"
-            required
-            value={formData.payment_mode}
+          <textarea
+            name="notes"
+            value={formData.notes}
             onChange={handleChange}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="cash">Cash</option>
-            <option value="bank_transfer">Bank Transfer</option>
-            <option value="cheque">Cheque</option>
-            <option value="upi">UPI</option>
-          </select>
+            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-base sm:text-sm"
+            placeholder="Add any notes (optional)"
+            rows={3}
+          />
         </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            <div className="flex items-center gap-2">
-              <CreditCard className="w-4 h-4" />
-              Payment Status
-            </div>
-          </label>
-          <select
-            name="payment_status"
-            required
-            value={formData.payment_status}
-            onChange={handleChange}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="pending">Pending</option>
-            <option value="partial">Partial</option>
-            <option value="completed">Completed</option>
-          </select>
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4" />
-            Reference Number
-          </div>
-        </label>
-        <input
-          type="text"
-          name="reference_number"
-          value={formData.reference_number}
-          onChange={handleChange}
-          className="w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          placeholder="Enter reference number (optional)"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4" />
-            Notes
-          </div>
-        </label>
-        <textarea
-          name="notes"
-          value={formData.notes}
-          onChange={handleChange}
-          className="w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          placeholder="Add any notes (optional)"
-          rows={2}
-        />
       </div>
 
       <button
         type="submit"
         disabled={isSubmitting}
-        className={`w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+        className={`w-full flex justify-center items-center px-4 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white touch-manipulation ${
           isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
         }`}
       >

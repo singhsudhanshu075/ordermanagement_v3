@@ -168,8 +168,8 @@ const PaymentsPage: React.FC = () => {
 
   if (!selectedOrder) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6">Manage Payments</h1>
+      <div className="max-w-7xl mx-auto px-4 py-4 sm:py-8">
+        <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Manage Payments</h1>
         
         <div className="space-y-4 mb-6">
           <div className="flex flex-col sm:flex-row gap-3">
@@ -180,7 +180,7 @@ const PaymentsPage: React.FC = () => {
               <input
                 type="text"
                 placeholder="Search orders..."
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="block w-full pl-10 pr-3 py-3 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-base sm:text-sm"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -188,7 +188,7 @@ const PaymentsPage: React.FC = () => {
             
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="inline-flex items-center justify-center px-4 py-3 sm:py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 touch-manipulation"
             >
               <Filter className="h-5 w-5 mr-2" />
               Filters
@@ -201,7 +201,7 @@ const PaymentsPage: React.FC = () => {
                 <h3 className="font-medium text-gray-700">Filters</h3>
                 <button 
                   onClick={clearFilters}
-                  className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+                  className="text-sm text-blue-600 hover:text-blue-800 flex items-center touch-manipulation"
                 >
                   <X className="h-4 w-4 mr-1" />
                   Clear filters
@@ -210,9 +210,9 @@ const PaymentsPage: React.FC = () => {
               
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Order Type</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Order Type</label>
                   <select
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
                     value={typeFilter}
                     onChange={(e) => setTypeFilter(e.target.value as 'all' | OrderType)}
                   >
@@ -226,7 +226,7 @@ const PaymentsPage: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Payment Status</label>
                   <button
                     type="button"
-                    className="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-3 sm:py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-base sm:text-sm h-12 sm:h-10 touch-manipulation"
                     onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
                   >
                     <span className="block truncate">{getStatusLabel()}</span>
@@ -240,7 +240,7 @@ const PaymentsPage: React.FC = () => {
                       {(['pending', 'partial', 'completed'] as PaymentStatus[]).map((status) => (
                         <div
                           key={status}
-                          className="relative py-2 pl-3 pr-9 cursor-pointer hover:bg-gray-100"
+                          className="relative py-3 sm:py-2 pl-3 pr-9 cursor-pointer hover:bg-gray-100 touch-manipulation"
                           onClick={() => handlePaymentStatusFilterChange(status)}
                         >
                           <div className="flex items-center">
@@ -261,10 +261,10 @@ const PaymentsPage: React.FC = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Customer</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Customer</label>
                   <input
                     type="text"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
                     value={customerFilter}
                     onChange={(e) => setCustomerFilter(e.target.value)}
                     placeholder="Filter by customer..."
@@ -272,10 +272,10 @@ const PaymentsPage: React.FC = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Supplier</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
                   <input
                     type="text"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
                     value={supplierFilter}
                     onChange={(e) => setSupplierFilter(e.target.value)}
                     placeholder="Filter by supplier..."
@@ -283,20 +283,20 @@ const PaymentsPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">From Date</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">From Date</label>
                   <input
                     type="date"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">To Date</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">To Date</label>
                   <input
                     type="date"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
                   />
@@ -322,24 +322,24 @@ const PaymentsPage: React.FC = () => {
   const remainingAmount = totalOrderAmount - totalPaidAmount;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="mb-6">
+    <div className="max-w-7xl mx-auto px-4 py-4 sm:py-8">
+      <div className="mb-4 sm:mb-6">
         <button
           onClick={() => {
             setSelectedOrder(null);
             setPayments([]);
             navigate('/payments');
           }}
-          className="flex items-center text-blue-600 hover:text-blue-800"
+          className="flex items-center text-blue-600 hover:text-blue-800 touch-manipulation"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Orders
         </button>
       </div>
 
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Payments for Order {selectedOrder.id}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold">Payments for Order {selectedOrder.id}</h1>
           <p className="text-gray-600 mt-1">
             {selectedOrder.type === 'sale' ? 'Sales' : 'Purchase'} order • {formatDateForDisplay(selectedOrder.date)}
           </p>
@@ -359,10 +359,10 @@ const PaymentsPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="space-y-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:space-y-0">
         <div className="space-y-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4">Order Details</h2>
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <h2 className="text-base sm:text-lg font-semibold mb-4">Order Details</h2>
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-gray-600">Order Type</span>
@@ -397,14 +397,14 @@ const PaymentsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4">Payment History</h2>
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <h2 className="text-base sm:text-lg font-semibold mb-4">Payment History</h2>
             <PaymentList payments={payments} />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-4">Record Payment</h2>
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+          <h2 className="text-base sm:text-lg font-semibold mb-4">Record Payment</h2>
           <PaymentForm 
             orderId={selectedOrder.id} 
             paymentStatus={selectedOrder.paymentStatus}

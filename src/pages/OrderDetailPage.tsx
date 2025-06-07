@@ -5,6 +5,7 @@ import { Order, Dispatch } from '../types';
 import DispatchForm from '../components/DispatchForm';
 import DispatchList from '../components/DispatchList';
 import { formatDateForDisplay, formatCurrency } from '../utils/helpers';
+import { CreditCard, ArrowLeft } from 'lucide-react';
 
 const OrderDetailPage: React.FC = () => {
   const { id } = useParams();
@@ -44,42 +45,65 @@ const OrderDetailPage: React.FC = () => {
     setDispatches(updatedDispatches);
   };
 
-  if (loading) return <div className="p-6">Loading order...</div>;
+  if (loading) return (
+    <div className="flex justify-center items-center min-h-screen">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    </div>
+  );
+  
   if (error || !order) {
     return (
-      <div className="p-6 text-red-600">
-        {error || 'Order not found'}
-        <button className="block mt-4 text-blue-600 underline" onClick={() => navigate('/orders')}>
-          Go back
-        </button>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
+          <p className="text-red-700">{error || 'Order not found'}</p>
+          <button 
+            className="mt-4 text-blue-600 underline touch-manipulation" 
+            onClick={() => navigate('/orders')}
+          >
+            Go back to orders
+          </button>
+        </div>
       </div>
     );
   }
-
-  // Calculate total dispatch amount including commission
-  const totalDispatchAmount = dispatches.reduce((sum, dispatch) => {
-    // Find the corresponding item's commission
-    const itemCommission = order.items.reduce((total, item) => total + item.commission, 0) / order.items.length;
-    return sum + ((dispatch.dispatchPrice + itemCommission) * dispatch.quantity);
-  }, 0);
 
   // Calculate total order amount including commission
   const totalOrderAmount = order.items.reduce((sum, item) => 
     sum + ((item.price + item.commission) * item.quantity), 0);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Order {order.id}</h1>
-        <p className="text-sm text-gray-500">
-          {order.type === 'sale' ? 'Sales' : 'Purchase'} order • {formatDateForDisplay(order.date)}
-        </p>
+    <div className="max-w-7xl mx-auto px-4 py-4 sm:py-8">
+      {/* Mobile Back Button */}
+      <div className="mb-4 sm:mb-6">
+        <button
+          onClick={() => navigate('/orders')}
+          className="flex items-center text-blue-600 hover:text-blue-800 touch-manipulation"
+        >
+          <ArrowLeft className="h-4 w-4 mr-1" />
+          Back to Orders
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold mb-2">Order {order.id}</h1>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <p className="text-sm text-gray-500">
+            {order.type === 'sale' ? 'Sales' : 'Purchase'} order • {formatDateForDisplay(order.date)}
+          </p>
+          <button
+            onClick={() => navigate(`/payments/${order.id}`)}
+            className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 touch-manipulation"
+          >
+            <CreditCard className="h-4 w-4 mr-2" />
+            Manage Payments
+          </button>
+        </div>
+      </div>
+
+      <div className="space-y-6 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0">
         <div className="space-y-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4">Order Details</h2>
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <h2 className="text-base sm:text-lg font-semibold mb-4">Order Details</h2>
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-gray-600">Status</span>
@@ -102,8 +126,16 @@ const OrderDetailPage: React.FC = () => {
                 <span className="font-medium">{formatCurrency(totalOrderAmount)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Total Dispatch Amount</span>
-                <span className="font-medium">{formatCurrency(totalDispatchAmount)}</span>
+                <span className="text-gray-600">Payment Status</span>
+                <span className={`font-medium capitalize ${
+                  order.paymentStatus === 'completed' 
+                    ? 'text-green-600' 
+                    : order.paymentStatus === 'partial' 
+                    ? 'text-amber-600' 
+                    : 'text-red-600'
+                }`}>
+                  {order.paymentStatus}
+                </span>
               </div>
               {order.notes && (
                 <div className="pt-3 border-t">
@@ -114,35 +146,32 @@ const OrderDetailPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4">Items</h2>
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <h2 className="text-base sm:text-lg font-semibold mb-4">Items</h2>
             <div className="divide-y">
-              {order.items?.map((item) => {
-                const itemTotal = (item.price + item.commission) * item.quantity;
-                return (
-                  <div key={item.id} className="py-3">
-                    <div className="flex justify-between mb-1">
-                      <span className="font-medium">{item.name}</span>
-                      <span>{formatCurrency(itemTotal)}</span>
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      {item.quantity} {item.unit} • ₹{item.price}/unit + ₹{item.commission} commission
-                    </div>
+              {order.items?.map((item) => (
+                <div key={item.id} className="py-3">
+                  <div className="flex justify-between mb-1">
+                    <span className="font-medium">{item.name}</span>
+                    <span>{formatCurrency((item.price + item.commission) * item.quantity)}</span>
                   </div>
-                );
-              })}
+                  <div className="text-sm text-gray-600">
+                    {item.quantity} {item.unit} • ₹{item.price}/unit + ₹{item.commission} commission
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
         <div className="space-y-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4">Record Dispatch</h2>
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <h2 className="text-base sm:text-lg font-semibold mb-4">Record Dispatch</h2>
             <DispatchForm order={order} onDispatchCreated={handleDispatchCreated} />
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4">Dispatch History</h2>
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <h2 className="text-base sm:text-lg font-semibold mb-4">Dispatch History</h2>
             <DispatchList dispatches={dispatches} />
           </div>
         </div>

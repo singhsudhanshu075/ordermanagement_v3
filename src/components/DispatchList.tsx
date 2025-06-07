@@ -17,7 +17,77 @@ const DispatchList: React.FC<DispatchListProps> = ({ dispatches }) => {
 
   return (
     <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-      <div className="overflow-x-auto">
+      {/* Mobile Card View */}
+      <div className="block sm:hidden">
+        <div className="divide-y divide-gray-200 bg-white">
+          {dispatches.map((dispatch) => (
+            <div key={dispatch.id} className="p-4">
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-gray-900">
+                    {formatDateForDisplay(dispatch.date)}
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    Qty: {dispatch.quantity?.toFixed(2)}
+                  </span>
+                </div>
+                
+                {dispatch.productType && (
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-500">Product Type:</span>
+                    <span className="text-sm text-gray-900">{dispatch.productType}</span>
+                  </div>
+                )}
+                
+                {dispatch.gaugeDifference && (
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-500">Gauge Diff:</span>
+                    <span className="text-sm text-gray-900">{dispatch.gaugeDifference}</span>
+                  </div>
+                )}
+                
+                {dispatch.dispatchPrice && (
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-500">Price:</span>
+                    <span className="text-sm text-gray-900">₹{dispatch.dispatchPrice.toFixed(2)}</span>
+                  </div>
+                )}
+                
+                {dispatch.loadingCharge && (
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-500">Loading Charge:</span>
+                    <span className="text-sm text-gray-900">₹{dispatch.loadingCharge.toFixed(2)}</span>
+                  </div>
+                )}
+                
+                {dispatch.taxRate && (
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-500">Tax Rate:</span>
+                    <span className="text-sm text-gray-900">{dispatch.taxRate}%</span>
+                  </div>
+                )}
+                
+                {dispatch.invoiceNumber && (
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-500">Invoice:</span>
+                    <span className="text-sm text-gray-900">{dispatch.invoiceNumber}</span>
+                  </div>
+                )}
+                
+                {dispatch.notes && (
+                  <div className="mt-2">
+                    <span className="text-sm text-gray-500">Notes:</span>
+                    <p className="text-sm text-gray-900 mt-1">{dispatch.notes}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden sm:block overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-300">
           <thead className="bg-gray-50">
             <tr>
