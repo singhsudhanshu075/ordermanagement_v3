@@ -17,105 +17,35 @@ const DispatchList: React.FC<DispatchListProps> = ({ dispatches }) => {
 
   return (
     <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-      {/* Mobile Card View */}
-      <div className="block sm:hidden">
-        <div className="divide-y divide-gray-200 bg-white">
-          {dispatches.map((dispatch) => (
-            <div key={dispatch.id} className="p-4">
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium text-gray-900">
-                    {formatDateForDisplay(dispatch.date)}
-                  </span>
-                  <span className="text-sm text-gray-500">
-                    Qty: {dispatch.quantity?.toFixed(2)}
-                  </span>
-                </div>
-                
-                {dispatch.productType && (
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-500">Product Type:</span>
-                    <span className="text-sm text-gray-900">{dispatch.productType}</span>
-                  </div>
-                )}
-                
-                {dispatch.gaugeDifference && (
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-500">Gauge Diff:</span>
-                    <span className="text-sm text-gray-900">{dispatch.gaugeDifference}</span>
-                  </div>
-                )}
-                
-                {dispatch.dispatchPrice && (
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-500">Price:</span>
-                    <span className="text-sm text-gray-900">₹{dispatch.dispatchPrice.toFixed(2)}</span>
-                  </div>
-                )}
-                
-                {dispatch.loadingCharge && (
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-500">Loading Charge:</span>
-                    <span className="text-sm text-gray-900">₹{dispatch.loadingCharge.toFixed(2)}</span>
-                  </div>
-                )}
-                
-                {dispatch.taxRate && (
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-500">Tax Rate:</span>
-                    <span className="text-sm text-gray-900">{dispatch.taxRate}%</span>
-                  </div>
-                )}
-                
-                {dispatch.invoiceNumber && (
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-500">Invoice:</span>
-                    <span className="text-sm text-gray-900">{dispatch.invoiceNumber}</span>
-                  </div>
-                )}
-                
-                {dispatch.notes && (
-                  <div className="mt-2">
-                    <span className="text-sm text-gray-500">Notes:</span>
-                    <p className="text-sm text-gray-900 mt-1">{dispatch.notes}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Desktop Table View */}
-      <div className="hidden sm:block overflow-x-auto">
+      <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-300">
           <thead className="bg-gray-50">
             <tr>
-              <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+              <th scope="col" className="py-3 sm:py-3.5 pl-3 sm:pl-4 pr-2 sm:pr-3 text-left text-xs sm:text-sm font-semibold text-gray-900 min-w-[80px]">
                 Date
               </th>
-              <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+              <th scope="col" className="px-2 sm:px-3 py-3 sm:py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900 min-w-[70px]">
                 Quantity
               </th>
-              <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+              <th scope="col" className="px-2 sm:px-3 py-3 sm:py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900 min-w-[80px]">
                 Product Type
               </th>
-              <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+              <th scope="col" className="px-2 sm:px-3 py-3 sm:py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900 min-w-[80px]">
                 Gauge Diff.
               </th>
-              <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+              <th scope="col" className="px-2 sm:px-3 py-3 sm:py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900 min-w-[90px]">
                 Loading Charge
               </th>
-              <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+              <th scope="col" className="px-2 sm:px-3 py-3 sm:py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900 min-w-[70px]">
                 Tax Rate
               </th>
-              <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+              <th scope="col" className="px-2 sm:px-3 py-3 sm:py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900 min-w-[80px]">
                 Price (₹)
               </th>
-              <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+              <th scope="col" className="px-2 sm:px-3 py-3 sm:py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900 min-w-[80px]">
                 Invoice #
               </th>
-              <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+              <th scope="col" className="px-2 sm:px-3 py-3 sm:py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900 min-w-[100px]">
                 Notes
               </th>
             </tr>
@@ -123,37 +53,47 @@ const DispatchList: React.FC<DispatchListProps> = ({ dispatches }) => {
           <tbody className="divide-y divide-gray-200 bg-white">
             {dispatches.map((dispatch) => (
               <tr key={dispatch.id}>
-                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                  {formatDateForDisplay(dispatch.date)}
+                <td className="whitespace-nowrap py-3 sm:py-4 pl-3 sm:pl-4 pr-2 sm:pr-3 text-xs sm:text-sm font-medium text-gray-900">
+                  <span className="hidden sm:inline">{formatDateForDisplay(dispatch.date)}</span>
+                  <span className="sm:hidden">{new Date(dispatch.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                 </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {dispatch.quantity?.toFixed(2)}
+                <td className="whitespace-nowrap px-2 sm:px-3 py-3 sm:py-4 text-xs sm:text-sm text-gray-500">
+                  {dispatch.quantity?.toFixed(1)}
                 </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                <td className="whitespace-nowrap px-2 sm:px-3 py-3 sm:py-4 text-xs sm:text-sm text-gray-500">
                   {dispatch.productType || '-'}
                 </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                <td className="whitespace-nowrap px-2 sm:px-3 py-3 sm:py-4 text-xs sm:text-sm text-gray-500">
                   {dispatch.gaugeDifference || '-'}
                 </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {dispatch.loadingCharge ? `₹${dispatch.loadingCharge.toFixed(2)}` : '-'}
+                <td className="whitespace-nowrap px-2 sm:px-3 py-3 sm:py-4 text-xs sm:text-sm text-gray-500">
+                  {dispatch.loadingCharge ? `₹${dispatch.loadingCharge.toFixed(0)}` : '-'}
                 </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                <td className="whitespace-nowrap px-2 sm:px-3 py-3 sm:py-4 text-xs sm:text-sm text-gray-500">
                   {dispatch.taxRate ? `${dispatch.taxRate}%` : '-'}
                 </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {dispatch.dispatchPrice ? `₹${dispatch.dispatchPrice.toFixed(2)}` : '-'}
+                <td className="whitespace-nowrap px-2 sm:px-3 py-3 sm:py-4 text-xs sm:text-sm text-gray-500">
+                  {dispatch.dispatchPrice ? `₹${dispatch.dispatchPrice.toFixed(0)}` : '-'}
                 </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {dispatch.invoiceNumber || '-'}
+                <td className="whitespace-nowrap px-2 sm:px-3 py-3 sm:py-4 text-xs sm:text-sm text-gray-500">
+                  <div className="max-w-[60px] sm:max-w-none truncate">
+                    {dispatch.invoiceNumber || '-'}
+                  </div>
                 </td>
-                <td className="px-3 py-4 text-sm text-gray-500 max-w-xs truncate">
-                  {dispatch.notes || '-'}
+                <td className="px-2 sm:px-3 py-3 sm:py-4 text-xs sm:text-sm text-gray-500">
+                  <div className="max-w-[80px] sm:max-w-xs truncate">
+                    {dispatch.notes || '-'}
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
+      
+      {/* Mobile scroll hint */}
+      <div className="sm:hidden bg-gray-50 px-4 py-2 text-center">
+        <p className="text-xs text-gray-500">← Scroll horizontally to see more details →</p>
       </div>
     </div>
   );
