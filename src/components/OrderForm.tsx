@@ -97,7 +97,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, onOrderCreated }) => {
 
       <div className="flex items-center text-xl font-semibold text-gray-800 mb-4">
         {type === 'sale' ? (
-          <><Truck className="mr-2 text-blue-600" size={24} /> Record Sale</>
+          <><Truck className="mr-2 text-blue-600\" size={24} /> Record Sale</>
         ) : (
           <><PackageCheck className="mr-2 text-emerald-600" size={24} /> Record Purchase</>
         )}
