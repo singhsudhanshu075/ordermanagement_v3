@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { Product, Customer, Supplier } from '../types';
+import { Product, Customer, Supplier, ProductType, ProductTypeCategory, OrderType } from '../types';
 
 // Product functions
 export const getProducts = async (): Promise<Product[]> => {
@@ -154,6 +154,94 @@ export const createSupplier = async (supplierData: Partial<Supplier>): Promise<S
     phone: data.phone,
     email: data.email,
     address: data.address,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+    userId: data.user_id
+  };
+};
+
+// Product Type functions
+export const getProductTypes = async (orderType?: OrderType): Promise<ProductType[]> => {
+  let query = supabase
+    .from('product_types')
+    .select('*')
+    .order('name', { ascending: true });
+
+  // Filter by order type if specified
+  if (orderType) {
+    query = query.or(`type.eq.${orderType},type.eq.both`);
+  }
+
+  const { data, error } = await query;
+
+  if (error) throw error;
+
+  return (data || []).map(productType => ({
+    id: productType.id,
+    name: productType.name,
+    gaugeDifference: productType.gauge_difference,
+    type: productType.type,
+    createdAt: productType.created_at,
+    updatedAt: productType.updated_at,
+    userId: productType.user_id
+  }));
+};
+
+export const createProductType = async (productTypeData: {
+  name: string;
+  gaugeDifference: number;
+  type: ProductTypeCategory;
+}): Promise<ProductType> => {
+  const { data: session } = await supabase.auth.getSession();
+  
+  if (!session?.session?.user) {
+    throw new Error('User must be logged in to create a product type');
+  }
+
+  const { data, error } = await supabase
+    .from('product_types')
+    .insert({
+      name: productTypeData.name.trim(),
+      gauge_difference: productTypeData.gaugeDifference,
+      type: productTypeData.type,
+      user_id: session.session.user.id
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+
+  return {
+    id: data.id,
+    name: data.name,
+    gaugeDifference: data.gauge_difference,
+    type: data.type,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+    userId: data.user_id
+  };
+};
+
+export const getProductTypeByName = async (name: string): Promise<ProductType | null> => {
+  const { data, error } = await supabase
+    .from('product_types')
+    .select('*')
+    .eq('name', name)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') {
+      // No rows returned
+      return null;
+    }
+    throw error;
+  }
+
+  return {
+    id: data.id,
+    name: data.name,
+    gaugeDifference: data.gauge_difference,
+    type: data.type,
     createdAt: data.created_at,
     updatedAt: data.updated_at,
     userId: data.user_id

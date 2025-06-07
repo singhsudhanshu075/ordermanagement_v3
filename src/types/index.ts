@@ -6,6 +6,8 @@ export type PaymentStatus = 'pending' | 'partial' | 'completed';
 
 export type PaymentMode = 'cash' | 'cheque' | 'bank_transfer' | 'upi';
 
+export type ProductTypeCategory = 'sale' | 'purchase' | 'both';
+
 export interface Order {
   id: string;
   type: OrderType;
@@ -89,6 +91,16 @@ export interface Supplier {
   phone?: string;
   email?: string;
   address?: string;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
+}
+
+export interface ProductType {
+  id: string;
+  name: string;
+  gaugeDifference: number;
+  type: ProductTypeCategory;
   createdAt: string;
   updatedAt: string;
   userId: string;

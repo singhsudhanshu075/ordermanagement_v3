@@ -1,38 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { TruckIcon, AlertCircle } from 'lucide-react';
-import { Order, OrderStatus } from '../types';
+import { TruckIcon, AlertCircle, Loader2 } from 'lucide-react';
+import { Order, OrderStatus, ProductType } from '../types';
 import { createDispatch } from '../services/orderService';
+import { getProductTypes } from '../services/masterDataService';
 import { getTodayDate } from '../utils/helpers';
 
 interface DispatchFormProps {
   order: Order;
   onDispatchCreated: () => void;
 }
-
-// Product type mapping with gauge differences
-const PRODUCT_TYPES = {
-  '40x3': 7800,
-  '30x3': 7800,
-  '32x3': 7500,
-  '35x5': 7200,
-  '35x4': 7500,
-  '40x5': 7000,
-  '40x6': 7000,
-  '50x5': 6400,
-  '65x5': 6400,
-  '75x5': 6400,
-  '50x6': 6100,
-  '65x6': 6100,
-  '75x6': 6100,
-  '65x8': 6400,
-  '75x8': 6400,
-  '65x10': 6700,
-  '75x10': 6700,
-  '50x4': 7500,
-  '40x4': 7500,
-  '45x4': 7800,
-  '45x5': 7200
-};
 
 const TAX_RATES = [7, 12, 18];
 
@@ -49,15 +25,44 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
   const [taxRate, setTaxRate] = useState<number>(18);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Product types state
+  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
+  const [loadingProductTypes, setLoadingProductTypes] = useState(true);
+  const [productTypesError, setProductTypesError] = useState<string | null>(null);
+
+  // Load product types based on order type
+  useEffect(() => {
+    const loadProductTypes = async () => {
+      try {
+        setLoadingProductTypes(true);
+        setProductTypesError(null);
+        const types = await getProductTypes(order.type);
+        setProductTypes(types);
+      } catch (error) {
+        console.error('Error loading product types:', error);
+        setProductTypesError('Failed to load product types. Please refresh the page.');
+      } finally {
+        setLoadingProductTypes(false);
+      }
+    };
+
+    loadProductTypes();
+  }, [order.type]);
 
   // Auto-fill gauge difference when product type changes
   useEffect(() => {
-    if (productType && PRODUCT_TYPES[productType as keyof typeof PRODUCT_TYPES]) {
-      setGaugeDifference(PRODUCT_TYPES[productType as keyof typeof PRODUCT_TYPES]);
+    if (productType) {
+      const selectedProductType = productTypes.find(pt => pt.name === productType);
+      if (selectedProductType) {
+        setGaugeDifference(selectedProductType.gaugeDifference);
+      } else {
+        setGaugeDifference(null);
+      }
     } else {
       setGaugeDifference(null);
     }
-  }, [productType]);
+  }, [productType, productTypes]);
 
   // Auto-populate dispatch price based on order type and items
   useEffect(() => {
@@ -157,6 +162,12 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
           <span className="block sm:inline">{error}</span>
         </div>
       )}
+
+      {productTypesError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <span className="block sm:inline">{productTypesError}</span>
+        </div>
+      )}
       
       <div className="space-y-4">
         {/* Date and Quantity */}
@@ -198,21 +209,37 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
           <div>
             <label htmlFor="product-type" className="block text-sm font-medium text-gray-700 mb-1">
               Product Type
+              <span className="text-xs text-gray-500 block">
+                Showing {order.type === 'sale' ? 'sales' : 'purchase'} products
+              </span>
             </label>
-            <select
-              id="product-type"
-              value={productType}
-              onChange={(e) => setProductType(e.target.value)}
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
-              required
-            >
-              <option value="">Select Product Type</option>
-              {Object.keys(PRODUCT_TYPES).map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
+            {loadingProductTypes ? (
+              <div className="flex items-center justify-center h-12 sm:h-10 border border-gray-300 rounded-md bg-gray-50">
+                <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                <span className="ml-2 text-sm text-gray-500">Loading...</span>
+              </div>
+            ) : (
+              <select
+                id="product-type"
+                value={productType}
+                onChange={(e) => setProductType(e.target.value)}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm h-12 sm:h-10"
+                required
+                disabled={productTypes.length === 0}
+              >
+                <option value="">Select Product Type</option>
+                {productTypes.map((type) => (
+                  <option key={type.id} value={type.name}>
+                    {type.name}
+                  </option>
+                ))}
+              </select>
+            )}
+            {!loadingProductTypes && productTypes.length === 0 && (
+              <p className="mt-1 text-xs text-gray-500">
+                No product types available for {order.type} orders
+              </p>
+            )}
           </div>
 
           <div>
@@ -339,9 +366,9 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
       <div className="flex justify-end pt-4">
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || loadingProductTypes}
           className={`w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white touch-manipulation ${
-            isSubmitting
+            isSubmitting || loadingProductTypes
               ? 'bg-gray-400 cursor-not-allowed'
               : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
           }`}
