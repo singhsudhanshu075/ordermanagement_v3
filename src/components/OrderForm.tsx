@@ -14,7 +14,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, onOrderCreated }) => {
   const [date, setDate] = useState(getTodayDate());
   const [contactName, setContactName] = useState('');
   const [items, setItems] = useState<OrderItem[]>([
-    { id: `item-${Date.now()}`, name: '', quantity: null, unit: 'pcs', price: null, commission: 0 }
+    { id: `item-${Date.now()}`, name: '', quantity: null, unit: 'kg', price: null, commission: 0 }
   ]);
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,7 +25,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, onOrderCreated }) => {
       id: `item-${Date.now()}`, 
       name: '', 
       quantity: null, 
-      unit: 'pcs',
+      unit: 'kg',
       price: null,
       commission: 0
     }]);
@@ -97,7 +97,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, onOrderCreated }) => {
 
       <div className="flex items-center text-xl font-semibold text-gray-800 mb-4">
         {type === 'sale' ? (
-          <><Truck className="mr-2 text-blue-600\" size={24} /> Record Sale</>
+          <><Truck className="mr-2 text-blue-600" size={24} /> Record Sale</>
         ) : (
           <><PackageCheck className="mr-2 text-emerald-600" size={24} /> Record Purchase</>
         )}
@@ -187,10 +187,9 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, onOrderCreated }) => {
                 onChange={(e) => handleItemChange(item.id, 'unit', e.target.value)}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="pcs">Pieces</option>
-                <option value="kg">Kilograms</option>
-                <option value="boxes">Boxes</option>
-                <option value="units">Units</option>
+                <option value="kg">Kg</option>
+                <option value="tonn">Tonn</option>
+                <option value="pieces">Pieces</option>
               </select>
             </div>
 
