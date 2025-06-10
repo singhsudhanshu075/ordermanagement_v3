@@ -2,6 +2,22 @@ import { supabase } from '../lib/supabase';
 import { Order, OrderType, Dispatch } from '../types';
 import { generateOrderId, calculateOrderStatus, getTodayDate } from '../utils/helpers';
 
+// Helper function to map dispatch data from database format to interface format
+const mapDispatchData = (dispatch: any): Dispatch => ({
+  id: dispatch.id,
+  orderId: dispatch.order_id,
+  date: dispatch.date,
+  quantity: dispatch.quantity,
+  dispatchPrice: dispatch.dispatch_price || 0,
+  invoiceNumber: dispatch.invoice_number || '',
+  notes: dispatch.notes,
+  createdAt: dispatch.created_at,
+  productType: dispatch.product_type,
+  gaugeDifference: dispatch.gauge_difference,
+  loadingCharge: dispatch.loading_charge,
+  taxRate: dispatch.tax_rate
+});
+
 // Get all orders
 export const getAllOrders = async (): Promise<Order[]> => {
   const { data, error } = await supabase
@@ -32,10 +48,14 @@ export const getAllOrders = async (): Promise<Order[]> => {
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     )[0];
 
+    // Map dispatches to proper format
+    const mappedDispatches = order.dispatches?.map(mapDispatchData) || [];
+
     return {
       ...order,
       totalQuantity,
       remainingQuantity,
+      dispatches: mappedDispatches,
       paymentStatus: latestPayment?.payment_status || order.payment_status || 'pending'
     };
   });
@@ -74,10 +94,14 @@ export const getOrdersByType = async (type: OrderType): Promise<Order[]> => {
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     )[0];
 
+    // Map dispatches to proper format
+    const mappedDispatches = order.dispatches?.map(mapDispatchData) || [];
+
     return {
       ...order,
       totalQuantity,
       remainingQuantity,
+      dispatches: mappedDispatches,
       paymentStatus: latestPayment?.payment_status || order.payment_status || 'pending'
     };
   });
@@ -115,10 +139,14 @@ export const getOrderById = async (id: string): Promise<Order | null> => {
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     )[0];
 
+    // Map dispatches to proper format
+    const mappedDispatches = data.dispatches?.map(mapDispatchData) || [];
+
     return {
       ...data,
       totalQuantity,
       remainingQuantity,
+      dispatches: mappedDispatches,
       paymentStatus: latestPayment?.payment_status || data.payment_status || 'pending'
     };
   }
@@ -183,6 +211,7 @@ export const createOrder = async (orderData: Partial<Order>, type: OrderType): P
     totalQuantity,
     remainingQuantity: totalQuantity,
     items: orderData.items || [],
+    dispatches: [],
     paymentStatus: 'pending'
   };
 };
@@ -246,10 +275,14 @@ export const filterOrdersByDateRange = async (startDate: string, endDate: string
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     )[0];
 
+    // Map dispatches to proper format
+    const mappedDispatches = order.dispatches?.map(mapDispatchData) || [];
+
     return {
       ...order,
       totalQuantity,
       remainingQuantity,
+      dispatches: mappedDispatches,
       paymentStatus: latestPayment?.payment_status || order.payment_status || 'pending'
     };
   });
@@ -288,10 +321,14 @@ export const searchOrders = async (query: string): Promise<Order[]> => {
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     )[0];
 
+    // Map dispatches to proper format
+    const mappedDispatches = order.dispatches?.map(mapDispatchData) || [];
+
     return {
       ...order,
       totalQuantity,
       remainingQuantity,
+      dispatches: mappedDispatches,
       paymentStatus: latestPayment?.payment_status || order.payment_status || 'pending'
     };
   });
@@ -371,13 +408,17 @@ export const createDispatch = async (orderId: string, dispatchData: Partial<Disp
 
   if (updateError) throw updateError;
 
+  // Map dispatches to proper format
+  const mappedDispatches = currentOrder.dispatches?.map(mapDispatchData) || [];
+
   return {
-    dispatch,
+    dispatch: mapDispatchData(dispatch),
     order: {
       ...updatedOrder,
       totalQuantity,
       remainingQuantity,
       items: currentOrder.items,
+      dispatches: mappedDispatches,
       paymentStatus: latestPayment?.payment_status || updatedOrder.payment_status || 'pending'
     }
   };
@@ -461,13 +502,17 @@ export const createBatchDispatches = async (orderId: string, dispatchesData: Par
 
   if (updateError) throw updateError;
 
+  // Map dispatches to proper format
+  const mappedDispatches = currentOrder.dispatches?.map(mapDispatchData) || [];
+
   return {
-    dispatches: dispatches || [],
+    dispatches: (dispatches || []).map(mapDispatchData),
     order: {
       ...updatedOrder,
       totalQuantity,
       remainingQuantity,
       items: currentOrder.items,
+      dispatches: mappedDispatches,
       paymentStatus: latestPayment?.payment_status || updatedOrder.payment_status || 'pending'
     }
   };
@@ -484,20 +529,7 @@ export const getDispatchesByOrderId = async (orderId: string): Promise<Dispatch[
   if (error) throw error;
 
   // Map snake_case from DB to camelCase for your UI
-  const dispatches = (data || []).map(d => ({
-    id: d.id,
-    orderId: d.order_id,
-    date: d.date,
-    quantity: d.quantity,
-    dispatchPrice: d.dispatch_price || 0,
-    invoiceNumber: d.invoice_number || '',
-    notes: d.notes,
-    createdAt: d.created_at,
-    productType: d.product_type,
-    gaugeDifference: d.gauge_difference,
-    loadingCharge: d.loading_charge,
-    taxRate: d.tax_rate
-  }));
+  const dispatches = (data || []).map(mapDispatchData);
 
   return dispatches;
 };
