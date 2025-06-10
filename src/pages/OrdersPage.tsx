@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAllOrders } from '../services/orderService';
 import { Order } from '../types';
 import { formatDateForDisplay, formatCurrency } from '../utils/helpers';
-import { Package, Truck, Search, Filter, X, ChevronDown, Box, TrendingUp, TrendingDown } from 'lucide-react';
+import { Package, Truck, Search, Filter, X, ChevronDown, Box, TrendingUp, TrendingDown, IndianRupee } from 'lucide-react';
 import OrderList from '../components/OrderList';
 
 const OrdersPage: React.FC = () => {
@@ -116,6 +116,21 @@ const OrdersPage: React.FC = () => {
   const totalPurchaseCommission = purchaseOrders.reduce((sum, order) => 
     sum + order.items.reduce((itemSum, item) => 
       itemSum + (item.commission * item.quantity), 0), 0);
+
+  // Calculate total receivable from dispatches
+  const totalReceivable = filteredOrders.reduce((sum, order) => {
+    return sum + (order.dispatches?.reduce((dispatchSum, dispatch) => {
+      const dispatchPrice = dispatch.dispatchPrice || 0;
+      const gaugeDifference = dispatch.gaugeDifference || 0;
+      const loadingCharge = dispatch.loadingCharge || 0;
+      const quantity = dispatch.quantity || 0;
+      const taxRate = dispatch.taxRate || 0;
+      
+      const baseAmount = (dispatchPrice + gaugeDifference + loadingCharge) * quantity;
+      const taxAmount = baseAmount * (taxRate / 100);
+      return dispatchSum + baseAmount + taxAmount;
+    }, 0) || 0);
+  }, 0);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-10">
@@ -261,7 +276,7 @@ const OrdersPage: React.FC = () => {
       )}
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <div className="bg-white rounded-lg shadow p-4 sm:p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-blue-100 rounded-md p-2 sm:p-3">
@@ -340,6 +355,20 @@ const OrdersPage: React.FC = () => {
                   Commission: {formatCurrency(totalPurchaseCommission)}
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0 bg-purple-100 rounded-md p-2 sm:p-3">
+              <IndianRupee className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+            </div>
+            <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-500">Total Receivable</p>
+              <p className="text-sm sm:text-lg font-semibold text-gray-900">
+                {formatCurrency(totalReceivable)}
+              </p>
             </div>
           </div>
         </div>

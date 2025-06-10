@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Truck, PackageCheck, ClipboardList, Package, TrendingUp, TrendingDown, Box, Boxes } from 'lucide-react';
+import { Truck, PackageCheck, ClipboardList, Package, TrendingUp, TrendingDown, Box, Boxes, IndianRupee } from 'lucide-react';
 import { getDashboardStats } from '../services/statsService';
 import { formatCurrency } from '../utils/helpers';
 
@@ -14,7 +14,8 @@ const HomePage: React.FC = () => {
     salesDispatched: 0,
     purchaseDispatched: 0,
     salesRemaining: 0,
-    purchaseRemaining: 0
+    purchaseRemaining: 0,
+    totalReceivable: 0
   });
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
@@ -126,7 +127,7 @@ const HomePage: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 mb-8 sm:mb-12">
         <div className="bg-white rounded-lg shadow p-4 sm:p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-blue-100 rounded-md p-2 sm:p-3">
@@ -150,6 +151,20 @@ const HomePage: React.FC = () => {
               <p className="text-xs sm:text-sm font-medium text-gray-500">Total Purchases</p>
               <p className="text-lg sm:text-2xl font-semibold text-gray-900 truncate">
                 {formatCurrency(stats.totalPurchaseAmount, 'lakhs')}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0 bg-purple-100 rounded-md p-2 sm:p-3">
+              <IndianRupee className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+            </div>
+            <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-500">Total Receivable</p>
+              <p className="text-lg sm:text-2xl font-semibold text-gray-900 truncate">
+                {formatCurrency(stats.totalReceivable, 'lakhs')}
               </p>
             </div>
           </div>
