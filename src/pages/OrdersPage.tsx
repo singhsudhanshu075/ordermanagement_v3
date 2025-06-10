@@ -39,6 +39,7 @@ const OrdersPage: React.FC = () => {
         const allOrders = await getAllOrders();
         allOrders.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         setOrders(allOrders);
+        console.log('Loaded orders with dispatches:', allOrders.map(o => ({ id: o.id, dispatches: o.dispatches?.length || 0 })));
       } catch (error) {
         console.error('Error loading orders:', error);
         setError('Failed to load orders. Please try again.');
@@ -117,11 +118,12 @@ const OrdersPage: React.FC = () => {
     sum + order.items.reduce((itemSum, item) => 
       itemSum + (item.commission * item.quantity), 0), 0);
 
-  // Calculate total receivable from dispatches - FIXED CALCULATION
+  // Calculate total receivable from dispatches - CORRECTED CALCULATION
   const totalReceivable = filteredOrders.reduce((sum, order) => {
     if (!order.dispatches || order.dispatches.length === 0) return sum;
     
-    return sum + order.dispatches.reduce((dispatchSum, dispatch) => {
+    const orderReceivable = order.dispatches.reduce((dispatchSum, dispatch) => {
+      // Use the correct property names from the Dispatch interface
       const dispatchPrice = dispatch.dispatchPrice || 0;
       const gaugeDifference = dispatch.gaugeDifference || 0;
       const loadingCharge = dispatch.loadingCharge || 0;
@@ -135,7 +137,20 @@ const OrdersPage: React.FC = () => {
       // Return total amount including tax
       return dispatchSum + baseAmount + taxAmount;
     }, 0);
+    
+    return sum + orderReceivable;
   }, 0);
+
+  console.log('Total receivable calculation:', {
+    filteredOrdersCount: filteredOrders.length,
+    ordersWithDispatches: filteredOrders.filter(o => o.dispatches && o.dispatches.length > 0).length,
+    totalReceivable,
+    sampleOrder: filteredOrders[0] ? {
+      id: filteredOrders[0].id,
+      dispatchesCount: filteredOrders[0].dispatches?.length || 0,
+      sampleDispatch: filteredOrders[0].dispatches?.[0]
+    } : null
+  });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-10">
