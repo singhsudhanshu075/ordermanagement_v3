@@ -117,19 +117,24 @@ const OrdersPage: React.FC = () => {
     sum + order.items.reduce((itemSum, item) => 
       itemSum + (item.commission * item.quantity), 0), 0);
 
-  // Calculate total receivable from dispatches
+  // Calculate total receivable from dispatches - FIXED CALCULATION
   const totalReceivable = filteredOrders.reduce((sum, order) => {
-    return sum + (order.dispatches?.reduce((dispatchSum, dispatch) => {
+    if (!order.dispatches || order.dispatches.length === 0) return sum;
+    
+    return sum + order.dispatches.reduce((dispatchSum, dispatch) => {
       const dispatchPrice = dispatch.dispatchPrice || 0;
       const gaugeDifference = dispatch.gaugeDifference || 0;
       const loadingCharge = dispatch.loadingCharge || 0;
       const quantity = dispatch.quantity || 0;
       const taxRate = dispatch.taxRate || 0;
       
+      // Calculate base amount
       const baseAmount = (dispatchPrice + gaugeDifference + loadingCharge) * quantity;
+      // Calculate tax amount
       const taxAmount = baseAmount * (taxRate / 100);
+      // Return total amount including tax
       return dispatchSum + baseAmount + taxAmount;
-    }, 0) || 0);
+    }, 0);
   }, 0);
 
   return (
