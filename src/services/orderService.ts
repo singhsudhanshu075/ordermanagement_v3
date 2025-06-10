@@ -383,6 +383,96 @@ export const createDispatch = async (orderId: string, dispatchData: Partial<Disp
   };
 };
 
+// Create multiple dispatches in batch
+export const createBatchDispatches = async (orderId: string, dispatchesData: Partial<Dispatch>[]): Promise<{ dispatches: Dispatch[]; order: Order }> => {
+  const { data: session } = await supabase.auth.getSession();
+  
+  if (!session?.session?.user) {
+    return Promise.reject(new Error('Please log in to create dispatches.'));
+  }
+
+  // Create all dispatches
+  const { data: dispatches, error: dispatchError } = await supabase
+    .from('dispatches')
+    .insert(
+      dispatchesData.map(dispatchData => ({
+        order_id: orderId,
+        date: dispatchData.date || getTodayDate(),
+        quantity: dispatchData.quantity || 0,
+        notes: dispatchData.notes,
+        user_id: session.session.user.id,
+        dispatch_price: dispatchData.dispatchPrice || 0,
+        invoice_number: dispatchData.invoiceNumber,
+        product_type: dispatchData.productType,
+        gauge_difference: dispatchData.gaugeDifference,
+        loading_charge: dispatchData.loadingCharge,
+        tax_rate: dispatchData.taxRate
+      }))
+    )
+    .select();
+
+  if (dispatchError) throw dispatchError;
+
+  // Get the current order with all dispatches
+  const { data: currentOrder, error: orderError } = await supabase
+    .from('orders')
+    .select(`
+      *,
+      items:order_items(*),
+      dispatches:dispatches(*),
+      payments(
+        amount,
+        payment_date,
+        payment_status,
+        created_at
+      )
+    `)
+    .eq('id', orderId)
+    .single();
+
+  if (orderError) throw orderError;
+
+  // Calculate total dispatched quantity including the new dispatches
+  const totalQuantity = currentOrder.total_quantity;
+  const newDispatchQuantity = dispatchesData.reduce((sum, d) => sum + (d.quantity || 0), 0);
+  const existingDispatchQuantity = currentOrder.dispatches.reduce((sum, d) => sum + (d.quantity || 0), 0);
+  const totalDispatchedQuantity = existingDispatchQuantity + newDispatchQuantity;
+  const remainingQuantity = totalQuantity - totalDispatchedQuantity;
+
+  // Get the latest payment based on created_at timestamp
+  const latestPayment = currentOrder.payments?.sort((a, b) => 
+    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  )[0];
+
+  // Determine the final status from the last dispatch
+  const finalStatus = dispatchesData[dispatchesData.length - 1]?.status || 'partial';
+
+  // Update order with new status and remaining quantity
+  const { data: updatedOrder, error: updateError } = await supabase
+    .from('orders')
+    .update({
+      remaining_quantity: remainingQuantity,
+      status: finalStatus,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', orderId)
+    .select()
+    .single();
+
+  if (updateError) throw updateError;
+
+  return {
+    dispatches: dispatches || [],
+    order: {
+      ...updatedOrder,
+      totalQuantity,
+      remainingQuantity,
+      items: currentOrder.items,
+      paymentStatus: latestPayment?.payment_status || updatedOrder.payment_status || 'pending'
+    }
+  };
+};
+
 // Get dispatches for an order
 export const getDispatchesByOrderId = async (orderId: string): Promise<Dispatch[]> => {
   const { data, error } = await supabase

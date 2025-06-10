@@ -90,7 +90,7 @@ const DispatchList: React.FC<DispatchListProps> = ({ dispatches }) => {
                   <span className="sm:hidden">{new Date(dispatch.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                 </td>
                 <td className="whitespace-nowrap px-2 sm:px-3 py-3 sm:py-4 text-xs sm:text-sm font-semibold text-amber-700 bg-amber-50/20">
-                  {dispatch.quantity?.toFixed(1)}
+                  {dispatch.quantity?.toFixed(4)}
                 </td>
                 <td className="whitespace-nowrap px-2 sm:px-3 py-3 sm:py-4 text-xs sm:text-sm font-medium bg-indigo-50/20">
                   {dispatch.productType ? (
