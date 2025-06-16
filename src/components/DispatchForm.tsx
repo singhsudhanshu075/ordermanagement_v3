@@ -104,15 +104,9 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
     if (pendingDispatches.length > 0) {
       const firstDispatch = pendingDispatches[0];
       // Auto-fill loading charge, tax rate, and invoice number from first dispatch
-      if (loadingCharge === null) {
-        setLoadingCharge(firstDispatch.loadingCharge);
-      }
-      if (taxRate === 18) { // Only auto-fill if still at default
-        setTaxRate(firstDispatch.taxRate);
-      }
-      if (invoiceNumber === '') {
-        setInvoiceNumber(firstDispatch.invoiceNumber);
-      }
+      setLoadingCharge(firstDispatch.loadingCharge);
+      setTaxRate(firstDispatch.taxRate);
+      setInvoiceNumber(firstDispatch.invoiceNumber);
     }
   }, [pendingDispatches.length]); // Only trigger when batch size changes
 
