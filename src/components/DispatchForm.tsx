@@ -214,6 +214,10 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
     setGaugeDifference(null);
   };
 
+  const getTotalBatchQuantity = (): number => {
+    return pendingDispatches.reduce((sum, dispatch) => sum + dispatch.quantity, 0);
+  };
+
   const handleAddToBatch = () => {
     setError(null);
     
@@ -258,24 +262,15 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
     setTaxRate(18);
   };
 
-  const getTotalBatchQuantity = (): number => {
-    return pendingDispatches.reduce((sum, dispatch) => sum + dispatch.quantity, 0);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    
-    if (!validateCurrentForm()) {
-      return;
-    }
-    
     setIsSubmitting(true);
     
     try {
-      // Prepare all dispatches (pending + current form)
-      const allDispatches = [
-        ...pendingDispatches.map(pd => ({
+      if (pendingDispatches.length > 0) {
+        // Only submit the batched dispatches, don't include current form
+        const dispatchesToSubmit = pendingDispatches.map(pd => ({
           date: pd.date,
           quantity: pd.quantity,
           dispatchPrice: pd.dispatchPrice,
@@ -286,8 +281,16 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
           gaugeDifference: pd.gaugeDifference,
           loadingCharge: pd.loadingCharge,
           taxRate: pd.taxRate
-        })),
-        {
+        }));
+
+        await createBatchDispatches(order.id, dispatchesToSubmit);
+      } else {
+        // Single dispatch from current form
+        if (!validateCurrentForm()) {
+          return;
+        }
+
+        await createDispatch(order.id, {
           date,
           quantity: quantity!,
           dispatchPrice,
@@ -298,15 +301,7 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
           gaugeDifference,
           loadingCharge,
           taxRate
-        }
-      ];
-
-      if (allDispatches.length === 1) {
-        // Single dispatch
-        await createDispatch(order.id, allDispatches[0]);
-      } else {
-        // Batch dispatch
-        await createBatchDispatches(order.id, allDispatches);
+        });
       }
       
       onDispatchCreated();
@@ -319,6 +314,45 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
     } catch (error) {
       console.error('Error creating dispatch(es):', error);
       setError('Failed to create dispatch(es). Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRecordSingle = async () => {
+    setError(null);
+    
+    if (!validateCurrentForm()) {
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      await createDispatch(order.id, {
+        date,
+        quantity: quantity!,
+        dispatchPrice,
+        invoiceNumber,
+        notes,
+        status,
+        productType,
+        gaugeDifference,
+        loadingCharge,
+        taxRate
+      });
+      
+      onDispatchCreated();
+      resetForm();
+      // Don't reset auto-filled fields if there are still pending dispatches
+      if (pendingDispatches.length === 0) {
+        setInvoiceNumber('');
+        setLoadingCharge(null);
+        setTaxRate(18);
+      }
+    } catch (error) {
+      console.error('Error creating dispatch:', error);
+      setError('Failed to create dispatch. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -721,31 +755,79 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
         </div>
         
         <div className="flex flex-col sm:flex-row gap-3 pt-4">
-          <button
-            type="button"
-            onClick={handleAddToBatch}
-            disabled={loadingProductTypes || showNewProductTypeForm}
-            className={`flex-1 sm:flex-none inline-flex justify-center items-center px-6 py-3 border border-blue-600 text-base font-medium rounded-md shadow-sm text-blue-600 bg-white hover:bg-blue-50 touch-manipulation ${
-              loadingProductTypes || showNewProductTypeForm
-                ? 'opacity-50 cursor-not-allowed'
-                : 'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
-            }`}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add to Batch
-          </button>
-          
-          <button
-            type="submit"
-            disabled={isSubmitting || loadingProductTypes || showNewProductTypeForm}
-            className={`flex-1 inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white touch-manipulation ${
-              isSubmitting || loadingProductTypes || showNewProductTypeForm
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
-            }`}
-          >
-            {isSubmitting ? 'Recording...' : pendingDispatches.length > 0 ? `Record All Dispatches (${pendingDispatches.length + 1})` : 'Record Dispatch'}
-          </button>
+          {pendingDispatches.length > 0 ? (
+            // When there are pending dispatches, show different buttons
+            <>
+              <button
+                type="button"
+                onClick={handleAddToBatch}
+                disabled={loadingProductTypes || showNewProductTypeForm}
+                className={`flex-1 sm:flex-none inline-flex justify-center items-center px-6 py-3 border border-blue-600 text-base font-medium rounded-md shadow-sm text-blue-600 bg-white hover:bg-blue-50 touch-manipulation ${
+                  loadingProductTypes || showNewProductTypeForm
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+                }`}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add to Batch
+              </button>
+              
+              <button
+                type="button"
+                onClick={handleRecordSingle}
+                disabled={isSubmitting || loadingProductTypes || showNewProductTypeForm}
+                className={`flex-1 sm:flex-none inline-flex justify-center items-center px-6 py-3 border border-green-600 text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 touch-manipulation ${
+                  isSubmitting || loadingProductTypes || showNewProductTypeForm
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500'
+                }`}
+              >
+                {isSubmitting ? 'Recording...' : 'Record Single'}
+              </button>
+              
+              <button
+                type="submit"
+                disabled={isSubmitting || loadingProductTypes || showNewProductTypeForm}
+                className={`flex-1 inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white touch-manipulation ${
+                  isSubmitting || loadingProductTypes || showNewProductTypeForm
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+                }`}
+              >
+                {isSubmitting ? 'Recording...' : `Record Batch (${pendingDispatches.length})`}
+              </button>
+            </>
+          ) : (
+            // When no pending dispatches, show normal buttons
+            <>
+              <button
+                type="button"
+                onClick={handleAddToBatch}
+                disabled={loadingProductTypes || showNewProductTypeForm}
+                className={`flex-1 sm:flex-none inline-flex justify-center items-center px-6 py-3 border border-blue-600 text-base font-medium rounded-md shadow-sm text-blue-600 bg-white hover:bg-blue-50 touch-manipulation ${
+                  loadingProductTypes || showNewProductTypeForm
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+                }`}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add to Batch
+              </button>
+              
+              <button
+                type="button"
+                onClick={handleRecordSingle}
+                disabled={isSubmitting || loadingProductTypes || showNewProductTypeForm}
+                className={`flex-1 inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white touch-manipulation ${
+                  isSubmitting || loadingProductTypes || showNewProductTypeForm
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+                }`}
+              >
+                {isSubmitting ? 'Recording...' : 'Record Dispatch'}
+              </button>
+            </>
+          )}
         </div>
       </form>
     </div>
