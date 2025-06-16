@@ -284,6 +284,13 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
         }));
 
         await createBatchDispatches(order.id, dispatchesToSubmit);
+        
+        // Clear the batch after successful submission
+        setPendingDispatches([]);
+        // Reset auto-filled fields after successful submission
+        setInvoiceNumber('');
+        setLoadingCharge(null);
+        setTaxRate(18);
       } else {
         // Single dispatch from current form
         if (!validateCurrentForm()) {
@@ -302,15 +309,11 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
           loadingCharge,
           taxRate
         });
+        
+        resetForm();
       }
       
       onDispatchCreated();
-      resetForm();
-      setPendingDispatches([]);
-      // Reset auto-filled fields after successful submission
-      setInvoiceNumber('');
-      setLoadingCharge(null);
-      setTaxRate(18);
     } catch (error) {
       console.error('Error creating dispatch(es):', error);
       setError('Failed to create dispatch(es). Please try again.');
@@ -756,7 +759,7 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
         
         <div className="flex flex-col sm:flex-row gap-3 pt-4">
           {pendingDispatches.length > 0 ? (
-            // When there are pending dispatches, show different buttons
+            // When there are pending dispatches, show batch recording button
             <>
               <button
                 type="button"
@@ -770,19 +773,6 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Add to Batch
-              </button>
-              
-              <button
-                type="button"
-                onClick={handleRecordSingle}
-                disabled={isSubmitting || loadingProductTypes || showNewProductTypeForm}
-                className={`flex-1 sm:flex-none inline-flex justify-center items-center px-6 py-3 border border-green-600 text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 touch-manipulation ${
-                  isSubmitting || loadingProductTypes || showNewProductTypeForm
-                    ? 'opacity-50 cursor-not-allowed'
-                    : 'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500'
-                }`}
-              >
-                {isSubmitting ? 'Recording...' : 'Record Single'}
               </button>
               
               <button
