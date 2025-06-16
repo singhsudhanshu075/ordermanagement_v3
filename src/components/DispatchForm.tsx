@@ -262,67 +262,43 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
     setTaxRate(18);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleRecordBatch = async () => {
     setError(null);
     setIsSubmitting(true);
     
     try {
-      if (pendingDispatches.length > 0) {
-        // Only submit the batched dispatches, don't include current form
-        const dispatchesToSubmit = pendingDispatches.map(pd => ({
-          date: pd.date,
-          quantity: pd.quantity,
-          dispatchPrice: pd.dispatchPrice,
-          invoiceNumber: pd.invoiceNumber,
-          notes: pd.notes,
-          status: pd.status,
-          productType: pd.productType,
-          gaugeDifference: pd.gaugeDifference,
-          loadingCharge: pd.loadingCharge,
-          taxRate: pd.taxRate
-        }));
+      const dispatchesToSubmit = pendingDispatches.map(pd => ({
+        date: pd.date,
+        quantity: pd.quantity,
+        dispatchPrice: pd.dispatchPrice,
+        invoiceNumber: pd.invoiceNumber,
+        notes: pd.notes,
+        status: pd.status,
+        productType: pd.productType,
+        gaugeDifference: pd.gaugeDifference,
+        loadingCharge: pd.loadingCharge,
+        taxRate: pd.taxRate
+      }));
 
-        await createBatchDispatches(order.id, dispatchesToSubmit);
-        
-        // Clear the batch after successful submission
-        setPendingDispatches([]);
-        // Reset auto-filled fields after successful submission
-        setInvoiceNumber('');
-        setLoadingCharge(null);
-        setTaxRate(18);
-      } else {
-        // Single dispatch from current form
-        if (!validateCurrentForm()) {
-          return;
-        }
-
-        await createDispatch(order.id, {
-          date,
-          quantity: quantity!,
-          dispatchPrice,
-          invoiceNumber,
-          notes,
-          status,
-          productType,
-          gaugeDifference,
-          loadingCharge,
-          taxRate
-        });
-        
-        resetForm();
-      }
+      await createBatchDispatches(order.id, dispatchesToSubmit);
       
       onDispatchCreated();
+      // Clear the batch after successful submission
+      setPendingDispatches([]);
+      // Reset auto-filled fields after successful submission
+      setInvoiceNumber('');
+      setLoadingCharge(null);
+      setTaxRate(18);
     } catch (error) {
-      console.error('Error creating dispatch(es):', error);
-      setError('Failed to create dispatch(es). Please try again.');
+      console.error('Error creating batch dispatches:', error);
+      setError('Failed to create batch dispatches. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleRecordSingle = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError(null);
     
     if (!validateCurrentForm()) {
@@ -776,7 +752,8 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
               </button>
               
               <button
-                type="submit"
+                type="button"
+                onClick={handleRecordBatch}
                 disabled={isSubmitting || loadingProductTypes || showNewProductTypeForm}
                 className={`flex-1 inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white touch-manipulation ${
                   isSubmitting || loadingProductTypes || showNewProductTypeForm
@@ -805,8 +782,7 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
               </button>
               
               <button
-                type="button"
-                onClick={handleRecordSingle}
+                type="submit"
                 disabled={isSubmitting || loadingProductTypes || showNewProductTypeForm}
                 className={`flex-1 inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white touch-manipulation ${
                   isSubmitting || loadingProductTypes || showNewProductTypeForm
