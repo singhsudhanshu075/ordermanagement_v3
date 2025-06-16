@@ -99,6 +99,23 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
     }
   }, [order.items]);
 
+  // Auto-fill fields from first dispatch in batch
+  useEffect(() => {
+    if (pendingDispatches.length > 0) {
+      const firstDispatch = pendingDispatches[0];
+      // Auto-fill loading charge, tax rate, and invoice number from first dispatch
+      if (loadingCharge === null) {
+        setLoadingCharge(firstDispatch.loadingCharge);
+      }
+      if (taxRate === 18) { // Only auto-fill if still at default
+        setTaxRate(firstDispatch.taxRate);
+      }
+      if (invoiceNumber === '') {
+        setInvoiceNumber(firstDispatch.invoiceNumber);
+      }
+    }
+  }, [pendingDispatches.length]); // Only trigger when batch size changes
+
   const handleProductTypeSelect = (value: string) => {
     if (value === 'ADD_NEW_PRODUCT_TYPE') {
       setShowNewProductTypeForm(true);
@@ -191,13 +208,16 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
       const averagePrice = totalPrice / order.items.length;
       setDispatchPrice(averagePrice);
     }
-    setInvoiceNumber('');
+    // Don't reset invoice number, loading charge, and tax rate if there are pending dispatches
+    if (pendingDispatches.length === 0) {
+      setInvoiceNumber('');
+      setLoadingCharge(null);
+      setTaxRate(18);
+    }
     setNotes('');
     setStatus(order.status);
     setProductType('');
     setGaugeDifference(null);
-    setLoadingCharge(null);
-    setTaxRate(18);
   };
 
   const handleAddToBatch = () => {
@@ -227,10 +247,21 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
 
   const handleRemoveFromBatch = (id: string) => {
     setPendingDispatches(prev => prev.filter(dispatch => dispatch.id !== id));
+    
+    // If removing the last item, reset auto-filled fields
+    if (pendingDispatches.length === 1) {
+      setInvoiceNumber('');
+      setLoadingCharge(null);
+      setTaxRate(18);
+    }
   };
 
   const handleClearBatch = () => {
     setPendingDispatches([]);
+    // Reset auto-filled fields when clearing batch
+    setInvoiceNumber('');
+    setLoadingCharge(null);
+    setTaxRate(18);
   };
 
   const getTotalBatchQuantity = (): number => {
@@ -287,6 +318,10 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
       onDispatchCreated();
       resetForm();
       setPendingDispatches([]);
+      // Reset auto-filled fields after successful submission
+      setInvoiceNumber('');
+      setLoadingCharge(null);
+      setTaxRate(18);
     } catch (error) {
       console.error('Error creating dispatch(es):', error);
       setError('Failed to create dispatch(es). Please try again.');
@@ -333,15 +368,17 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
           </div>
           
           <div className="space-y-2 mb-3">
-            {pendingDispatches.map((dispatch) => (
+            {pendingDispatches.map((dispatch, index) => (
               <div key={dispatch.id} className="bg-white rounded p-3 text-sm">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="grid grid-cols-2 gap-2 text-xs">
-                      <span><strong>Date:</strong> {dispatch.date}</span>
+                      <span><strong>#{index + 1} Date:</strong> {dispatch.date}</span>
                       <span><strong>Quantity:</strong> {dispatch.quantity.toFixed(4)}</span>
                       <span><strong>Product:</strong> {dispatch.productType || 'N/A'}</span>
                       <span><strong>Loading:</strong> ₹{dispatch.loadingCharge || 0}</span>
+                      <span><strong>Tax:</strong> {dispatch.taxRate}%</span>
+                      <span><strong>Invoice:</strong> {dispatch.invoiceNumber || 'N/A'}</span>
                     </div>
                   </div>
                   <button
@@ -356,8 +393,17 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
             ))}
           </div>
           
-          <div className="bg-blue-100 rounded p-2 text-sm text-blue-800">
-            <strong>Total Batch Quantity: {getTotalBatchQuantity().toFixed(4)}</strong>
+          <div className="bg-blue-100 rounded p-3 text-sm text-blue-800">
+            <div className="flex justify-between items-center">
+              <strong>Total Batch Quantity: {getTotalBatchQuantity().toFixed(4)}</strong>
+              <span className="text-xs">
+                {pendingDispatches.length > 0 && (
+                  <span className="bg-blue-200 px-2 py-1 rounded">
+                    Auto-filling from first dispatch: Loading ₹{pendingDispatches[0].loadingCharge || 0}, Tax {pendingDispatches[0].taxRate}%
+                  </span>
+                )}
+              </span>
+            </div>
           </div>
         </div>
       )}
@@ -365,6 +411,11 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="flex items-center text-base sm:text-lg font-semibold text-gray-800 mb-2">
           <TruckIcon className="mr-2 text-blue-600" size={20} /> Record Dispatch
+          {pendingDispatches.length > 0 && (
+            <span className="ml-2 text-sm font-normal text-blue-600 bg-blue-100 px-2 py-1 rounded">
+              Adding to batch ({pendingDispatches.length} items)
+            </span>
+          )}
         </div>
         
         {error && (
@@ -399,7 +450,14 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
             <div>
               <label htmlFor="dispatch-quantity" className="block text-sm font-medium text-gray-700 mb-1">
                 Quantity
-                <span className="text-xs text-gray-500 block">Remaining: {order.remainingQuantity?.toFixed(4)}</span>
+                <span className="text-xs text-gray-500 block">
+                  Remaining: {order.remainingQuantity?.toFixed(4)}
+                  {pendingDispatches.length > 0 && (
+                    <span className="text-blue-600 ml-2">
+                      | Batch Total: {getTotalBatchQuantity().toFixed(4)}
+                    </span>
+                  )}
+                </span>
               </label>
               <input
                 type="number"
@@ -555,6 +613,9 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
             <div>
               <label htmlFor="loading-charge" className="block text-sm font-medium text-gray-700 mb-1">
                 Loading Charge (₹)
+                {pendingDispatches.length > 0 && (
+                  <span className="text-xs text-blue-600 block">Auto-filled from first dispatch</span>
+                )}
               </label>
               <select
                 id="loading-charge"
@@ -574,6 +635,9 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
             <div>
               <label htmlFor="tax-rate" className="block text-sm font-medium text-gray-700 mb-1">
                 Tax Rate (%)
+                {pendingDispatches.length > 0 && (
+                  <span className="text-xs text-blue-600 block">Auto-filled from first dispatch</span>
+                )}
               </label>
               <select
                 id="tax-rate"
@@ -614,6 +678,9 @@ const DispatchForm: React.FC<DispatchFormProps> = ({ order, onDispatchCreated })
             <div>
               <label htmlFor="invoice-number" className="block text-sm font-medium text-gray-700 mb-1">
                 Invoice Number
+                {pendingDispatches.length > 0 && (
+                  <span className="text-xs text-blue-600 block">Auto-filled from first dispatch</span>
+                )}
               </label>
               <input
                 type="text"
