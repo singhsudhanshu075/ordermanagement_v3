@@ -10,8 +10,8 @@ interface DispatchFormProps {
   onDispatchCreated: () => void;
 }
 
-const TAX_RATES = [7, 12, 13, 18];
-const LOADING_CHARGES = [165, 265];
+const TAX_RATES = [7, 11, 12, 13, 18];
+const LOADING_CHARGES = [0, 165, 265];
 
 interface PendingDispatch {
   id: string;
